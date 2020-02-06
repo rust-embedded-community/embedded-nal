@@ -11,7 +11,7 @@ pub struct Ipv4Address(u32);
 /// Represents an IPv6 address (e.g. `2001:0db8:85a3:0000:0000:8a2e:0370:7334`)
 #[derive(Copy, Clone, Hash, PartialEq, PartialOrd, Eq, Ord)]
 pub struct Ipv6Address {
-	group: [u16; 8]
+	group: [u16; 8],
 }
 
 /// Represents a TCP or UDP port number
@@ -42,16 +42,18 @@ pub enum IpAddress {
 /// which knows how to driver the Rust Standard Library's `std::net` module. Given this trait, you can how
 /// write a portable HTTP client which can work with either implementation.
 pub trait TcpStack {
+	/// The type returned when we create a new TCP socket
 	type TcpSocket;
+	/// The type returned when we have an error
 	type Error: core::fmt::Debug;
 
-	/// Open a new TCP socket to the given address and port. The socket starts in the unconnected state.
+	/// Open a new TCP socket. The socket starts in the unconnected state.
 	fn open(mode: Mode) -> Result<Self::TcpSocket, Self::Error>;
 
 	/// Connect to the given remote host and port.
 	fn connect(host: IpAddress, port: Port) -> Result<Self::TcpSocket, Self::Error>;
 
-	/// Check if this socket is still connected
+	/// Check if this socket is connected
 	fn is_connected(&self, socket: &Self::TcpSocket) -> Result<bool, Self::Error>;
 
 	/// Write to the stream. Returns the number of bytes written is returned
@@ -61,7 +63,11 @@ pub trait TcpStack {
 	/// Read from the stream. Returns `Ok(n)`, which means `n` bytes of
 	/// data have been received and they have been placed in
 	/// `&buffer[0..n]`, or an error.
-	fn read(&self, socket: &mut Self::TcpSocket, buffer: &mut [u8]) -> nb::Result<usize, Self::Error>;
+	fn read(
+		&self,
+		socket: &mut Self::TcpSocket,
+		buffer: &mut [u8],
+	) -> nb::Result<usize, Self::Error>;
 
 	/// Close an existing TCP socket.
 	fn close(socket: Self::TcpSocket) -> Result<(), Self::Error>;
@@ -73,7 +79,9 @@ pub trait TcpStack {
 /// Rust Standard Library's `std::net` module. Given this trait, you can how
 /// write a portable CoAP client which can work with either implementation.
 pub trait UdpStack {
+	/// The type returned when we create a new UDP socket
 	type UdpSocket;
+	/// The type returned when we have an error
 	type Error: core::fmt::Debug;
 
 	/// Open a new UDP socket to the given address and port. UDP is connectionless,
@@ -86,7 +94,11 @@ pub trait UdpStack {
 	/// Read a datagram the remote host has sent to us. Returns `Ok(n)`, which
 	/// means a datagram of size `n` has been received and it has been placed
 	/// in `&buffer[0..n]`, or an error.
-	fn read(&self, socket: &mut Self::UdpSocket, buffer: &mut [u8]) -> nb::Result<usize, Self::Error>;
+	fn read(
+		&self,
+		socket: &mut Self::UdpSocket,
+		buffer: &mut [u8],
+	) -> nb::Result<usize, Self::Error>;
 
 	/// Close an existing UDP socket.
 	fn close(socket: Self::UdpSocket) -> Result<(), Self::Error>;
