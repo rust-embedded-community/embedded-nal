@@ -48,10 +48,10 @@ pub trait TcpStack {
 	type Error: core::fmt::Debug;
 
 	/// Open a new TCP socket. The socket starts in the unconnected state.
-	fn open(mode: Mode) -> Result<Self::TcpSocket, Self::Error>;
+	fn open(&self, mode: Mode) -> Result<Self::TcpSocket, Self::Error>;
 
 	/// Connect to the given remote host and port.
-	fn connect(host: IpAddress, port: Port) -> Result<Self::TcpSocket, Self::Error>;
+	fn connect(&self, host: IpAddress, port: Port) -> Result<Self::TcpSocket, Self::Error>;
 
 	/// Check if this socket is connected
 	fn is_connected(&self, socket: &Self::TcpSocket) -> Result<bool, Self::Error>;
@@ -70,7 +70,7 @@ pub trait TcpStack {
 	) -> nb::Result<usize, Self::Error>;
 
 	/// Close an existing TCP socket.
-	fn close(socket: Self::TcpSocket) -> Result<(), Self::Error>;
+	fn close(&self, socket: Self::TcpSocket) -> Result<(), Self::Error>;
 }
 
 /// This trait is implemented by UDP/IP stacks. You could, for example, have
@@ -86,7 +86,8 @@ pub trait UdpStack {
 
 	/// Open a new UDP socket to the given address and port. UDP is connectionless,
 	/// so unlike `TcpStack` no `connect()` is required.
-	fn open(addr: IpAddress, port: Port, mode: Mode) -> Result<Self::UdpSocket, Self::Error>;
+	fn open(&self, addr: IpAddress, port: Port, mode: Mode)
+		-> Result<Self::UdpSocket, Self::Error>;
 
 	/// Send a datagram to the remote host.
 	fn write(&self, socket: &mut Self::UdpSocket, buffer: &[u8]) -> nb::Result<(), Self::Error>;
@@ -101,7 +102,7 @@ pub trait UdpStack {
 	) -> nb::Result<usize, Self::Error>;
 
 	/// Close an existing UDP socket.
-	fn close(socket: Self::UdpSocket) -> Result<(), Self::Error>;
+	fn close(&self, socket: Self::UdpSocket) -> Result<(), Self::Error>;
 }
 
 impl core::fmt::Debug for Ipv4Address {
