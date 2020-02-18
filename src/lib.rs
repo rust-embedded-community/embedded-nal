@@ -4,19 +4,7 @@
 #![deny(missing_docs)]
 #![deny(unsafe_code)]
 
-/// Represents an IPv4 address (e.g. `127.0.0.1`)
-#[derive(Copy, Clone, Hash, PartialEq, PartialOrd, Eq, Ord)]
-pub struct Ipv4Address(u32);
-
-/// Represents an IPv6 address (e.g. `2001:0db8:85a3:0000:0000:8a2e:0370:7334`)
-#[derive(Copy, Clone, Hash, PartialEq, PartialOrd, Eq, Ord)]
-pub struct Ipv6Address {
-	group: [u16; 8],
-}
-
-/// Represents a TCP or UDP port number
-#[derive(Debug, Copy, Clone, Hash, PartialEq, PartialOrd, Eq, Ord)]
-pub struct Port(u16);
+use no_std_net::SocketAddr;
 
 /// Whether a socket should block when a read/write can't be performed, or return early.
 pub enum Mode {
@@ -26,15 +14,6 @@ pub enum Mode {
 	NonBlocking,
 	/// The function call will wait only up the given number of milliseconds to complete the operation.
 	Timeout(u16),
-}
-
-/// Represents an Internet Protocol address, in either V4 or V6 formats.
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub enum IpAddress {
-	/// This is an IPV4 address
-	IpV4(Ipv4Address),
-	/// This is an IPV6 address
-	IpV6(Ipv6Address),
 }
 
 /// This trait is implemented by TCP/IP stacks. You could, for example, have an implementation
@@ -51,7 +30,7 @@ pub trait TcpStack {
 	fn open(&self, mode: Mode) -> Result<Self::TcpSocket, Self::Error>;
 
 	/// Connect to the given remote host and port.
-	fn connect(&self, host: IpAddress, port: Port) -> Result<Self::TcpSocket, Self::Error>;
+	fn connect(&self, remote: SocketAddr) -> Result<Self::TcpSocket, Self::Error>;
 
 	/// Check if this socket is connected
 	fn is_connected(&self, socket: &Self::TcpSocket) -> Result<bool, Self::Error>;
@@ -86,7 +65,7 @@ pub trait UdpStack {
 
 	/// Open a new UDP socket to the given address and port. UDP is connectionless,
 	/// so unlike `TcpStack` no `connect()` is required.
-	fn open(&self, addr: IpAddress, port: Port, mode: Mode)
+	fn open(&self, remote: SocketAddr, mode: Mode)
 		-> Result<Self::UdpSocket, Self::Error>;
 
 	/// Send a datagram to the remote host.
@@ -103,35 +82,6 @@ pub trait UdpStack {
 
 	/// Close an existing UDP socket.
 	fn close(&self, socket: Self::UdpSocket) -> Result<(), Self::Error>;
-}
-
-impl core::fmt::Debug for Ipv4Address {
-	fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
-		write!(f, "Ipv4Address({})", self)
-	}
-}
-
-impl core::fmt::Display for Ipv4Address {
-	fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
-		let bytes = self.0.to_be_bytes();
-		write!(f, "{}.{}.{}.{}", bytes[0], bytes[1], bytes[2], bytes[3])
-	}
-}
-
-impl core::fmt::Debug for Ipv6Address {
-	fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
-		write!(f, "Ipv6Address({})", self)
-	}
-}
-
-impl core::fmt::Display for Ipv6Address {
-	fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
-		write!(f, "{:04x}", self.group[0])?;
-		for g in self.group.iter().skip(1) {
-			write!(f, "::{:04x}", g)?;
-		}
-		Ok(())
-	}
 }
 
 // End Of File
