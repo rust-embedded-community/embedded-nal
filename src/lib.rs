@@ -4,7 +4,7 @@
 #![deny(missing_docs)]
 #![deny(unsafe_code)]
 
-use no_std_net::SocketAddr;
+pub use no_std_net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, SocketAddrV6};
 
 /// Whether a socket should block when a read/write can't be performed, or return early.
 pub enum Mode {
@@ -65,8 +65,7 @@ pub trait UdpStack {
 
 	/// Open a new UDP socket to the given address and port. UDP is connectionless,
 	/// so unlike `TcpStack` no `connect()` is required.
-	fn open(&self, remote: SocketAddr, mode: Mode)
-		-> Result<Self::UdpSocket, Self::Error>;
+	fn open(&self, remote: SocketAddr, mode: Mode) -> Result<Self::UdpSocket, Self::Error>;
 
 	/// Send a datagram to the remote host.
 	fn write(&self, socket: &mut Self::UdpSocket, buffer: &[u8]) -> nb::Result<(), Self::Error>;
