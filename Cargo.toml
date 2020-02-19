@@ -10,4 +10,5 @@ license = "MIT or Apache-2.0"
 
 [dependencies]
 nb = "0.1"
-no-std-net = "0.2.3"
+# no-std-net = "0.2.3"
+no-std-net = { path = "../no-std-net", features = ["serde"] }
