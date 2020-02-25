@@ -27,33 +27,33 @@ pub trait TcpStack {
 	type Error: core::fmt::Debug;
 
 	/// Open a new TCP socket. The socket starts in the unconnected state.
-	fn open(&mut self, mode: Mode) -> Result<Self::TcpSocket, Self::Error>;
+	fn open(&self, mode: Mode) -> Result<Self::TcpSocket, Self::Error>;
 
 	/// Connect to the given remote host and port.
-	fn connect(&mut self, socket: Self::TcpSocket, remote: SocketAddr) -> Result<Self::TcpSocket, Self::Error>;
+	fn connect(
+		&self,
+		socket: Self::TcpSocket,
+		remote: SocketAddr,
+	) -> Result<Self::TcpSocket, Self::Error>;
 
 	/// Check if this socket is connected
-	fn is_connected(&mut self, socket: &Self::TcpSocket) -> Result<bool, Self::Error>;
+	fn is_connected(&self, socket: &Self::TcpSocket) -> Result<bool, Self::Error>;
 
 	/// Write to the stream. Returns the number of bytes written is returned
 	/// (which may be less than `buffer.len()`), or an error.
-	fn write(
-		&mut self,
-		socket: &mut Self::TcpSocket,
-		buffer: &[u8],
-	) -> nb::Result<usize, Self::Error>;
+	fn write(&self, socket: &mut Self::TcpSocket, buffer: &[u8]) -> nb::Result<usize, Self::Error>;
 
 	/// Read from the stream. Returns `Ok(n)`, which means `n` bytes of
 	/// data have been received and they have been placed in
 	/// `&buffer[0..n]`, or an error.
 	fn read(
-		&mut self,
+		&self,
 		socket: &mut Self::TcpSocket,
 		buffer: &mut [u8],
 	) -> nb::Result<usize, Self::Error>;
 
 	/// Close an existing TCP socket.
-	fn close(&mut self, socket: Self::TcpSocket) -> Result<(), Self::Error>;
+	fn close(&self, socket: Self::TcpSocket) -> Result<(), Self::Error>;
 }
 
 /// This trait is implemented by UDP/IP stacks. You could, for example, have
@@ -69,23 +69,22 @@ pub trait UdpStack {
 
 	/// Open a new UDP socket to the given address and port. UDP is connectionless,
 	/// so unlike `TcpStack` no `connect()` is required.
-	fn open(&mut self, remote: SocketAddr, mode: Mode) -> Result<Self::UdpSocket, Self::Error>;
+	fn open(&self, remote: SocketAddr, mode: Mode) -> Result<Self::UdpSocket, Self::Error>;
 
 	/// Send a datagram to the remote host.
-	fn write(&mut self, socket: &mut Self::UdpSocket, buffer: &[u8])
-		-> nb::Result<(), Self::Error>;
+	fn write(&self, socket: &mut Self::UdpSocket, buffer: &[u8]) -> nb::Result<(), Self::Error>;
 
 	/// Read a datagram the remote host has sent to us. Returns `Ok(n)`, which
 	/// means a datagram of size `n` has been received and it has been placed
 	/// in `&buffer[0..n]`, or an error.
 	fn read(
-		&mut self,
+		&self,
 		socket: &mut Self::UdpSocket,
 		buffer: &mut [u8],
 	) -> nb::Result<usize, Self::Error>;
 
 	/// Close an existing UDP socket.
-	fn close(&mut self, socket: Self::UdpSocket) -> Result<(), Self::Error>;
+	fn close(&self, socket: Self::UdpSocket) -> Result<(), Self::Error>;
 }
 
 // End Of File
