@@ -10,3 +10,4 @@ license = "MIT or Apache-2.0"
 
 [dependencies]
 nb = "0.1"
+no-std-net = "0.3.0"
