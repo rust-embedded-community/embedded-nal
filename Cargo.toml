@@ -8,7 +8,7 @@ authors = [
 ]
 edition = "2018"
 description = "A Network Abstraction Layer (NAL) for Embedded Systems"
-license = "MIT or Apache-2.0"
+license = "MIT OR Apache-2.0"
 repository = "https://github.com/rust-embedded-community/embedded-nal"
 homepage = "https://github.com/rust-embedded-community/embedded-nal"
 documentation = "https://docs.rs/embedded-nal"
