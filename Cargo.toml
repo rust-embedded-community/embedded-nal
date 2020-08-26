@@ -9,6 +9,6 @@ license = "MIT or Apache-2.0"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-nb = "0.1"
+nb = "1"
 no-std-net = "0.3.0"
 heapless = "^0.5"
