@@ -4,6 +4,7 @@
 #![deny(missing_docs)]
 #![deny(unsafe_code)]
 
+pub use nb;
 mod dns;
 pub use dns::{AddrType, Dns};
 
