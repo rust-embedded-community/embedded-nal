@@ -1,7 +1,11 @@
 [package]
 name = "embedded-nal"
 version = "0.1.0"
-authors = ["Jonathan 'theJPster' Pallant <github@thejpster.org.uk>"]
+authors = [
+    "Jonathan 'theJPster' Pallant <github@thejpster.org.uk>",
+    "Mathias Koch <mk@blackbird.online>",
+    "Diego Barrios Romero <eldruin@gmail.com>",
+]
 edition = "2018"
 description = "A Network Abstraction Layer (NAL) for Embedded Systems"
 license = "MIT or Apache-2.0"
