@@ -33,7 +33,7 @@ try to single out the best option. Once there is consensus this will be merged i
 
 These issues / PRs will be labeled as `proposal`s in the issue tracker.
 
-# Minimum Supported Rust Version (MSRV)
+## Minimum Supported Rust Version (MSRV)
 
 This crate is guaranteed to compile on stable Rust 1.36.0 and up. It *might*
 compile with older versions but that may change in any new patch release.
