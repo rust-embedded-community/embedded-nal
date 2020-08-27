@@ -8,7 +8,7 @@ pub use nb;
 mod dns;
 pub use dns::{AddrType, Dns};
 
-use generic_array::{GenericArray, ArrayLength};
+use generic_array::{ArrayLength, GenericArray};
 
 pub use no_std_net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, SocketAddrV6};
 
@@ -31,8 +31,8 @@ pub trait TcpStack {
 	type TcpSocket;
 	/// The type returned when we have an error
 	type Error: core::fmt::Debug;
-    /// The default read/write implementation buffer size.
-    type Size: ArrayLength<u8>;
+	/// The default read/write implementation buffer size.
+	type Size: ArrayLength<u8>;
 
 	/// Open a new TCP socket. The socket starts in the unconnected state.
 	fn open(&self, mode: Mode) -> Result<Self::TcpSocket, Self::Error>;
@@ -51,17 +51,17 @@ pub trait TcpStack {
 	/// (which may be less than `buffer.len()`), or an error.
 	fn write(&self, socket: &mut Self::TcpSocket, buffer: &[u8]) -> nb::Result<usize, Self::Error>;
 
-    /// Write to the stream using a closure. The provided function should copy data into the
-    /// provided buffer and return the number of bytes written. Returns the number of bytes actually
-    /// written.
-    fn write_with<F>(&self, socket: &mut Self::TcpSocket, f: F) -> nb::Result<usize, Self::Error>
-    where
-        F: FnOnce(&mut [u8]) -> usize
-    {
-        let mut buffer: GenericArray<u8, Self::Size> = GenericArray::default();
-        let len = f(&mut buffer);
-        self.write(socket, &buffer[..len])
-    }
+	/// Write to the stream using a closure. The provided function should copy data into the
+	/// provided buffer and return the number of bytes written. Returns the number of bytes actually
+	/// written.
+	fn write_with<F>(&self, socket: &mut Self::TcpSocket, f: F) -> nb::Result<usize, Self::Error>
+	where
+		F: FnOnce(&mut [u8]) -> usize,
+	{
+		let mut buffer: GenericArray<u8, Self::Size> = GenericArray::default();
+		let len = f(&mut buffer);
+		self.write(socket, &buffer[..len])
+	}
 
 	/// Read from the stream. Returns `Ok(n)`, which means `n` bytes of
 	/// data have been received and they have been placed in
@@ -71,35 +71,39 @@ pub trait TcpStack {
 		mut socket: &mut Self::TcpSocket,
 		buffer: &mut [u8],
 	) -> nb::Result<usize, Self::Error> {
-        let len = self.try_recv(&mut socket, buffer)?;
-        self.recv_commit(&mut socket, len)?;
-        Ok(len)
-    }
+		let len = self.try_recv(&mut socket, buffer)?;
+		self.recv_commit(&mut socket, len)?;
+		Ok(len)
+	}
 
-    /// Attempt to receive bytes from the socket.
-    /// Returns the number of bytes actually read. Note that this function should not remove data
-    /// from the socket stream. Once data is actually consumed, `recv_commit()` should be called to
-    /// consume the data.
-    fn try_recv(&self, socket: &mut Self::TcpSocket, buffer: &mut [u8]) -> Result<usize, Self::Error>;
+	/// Attempt to receive bytes from the socket.
+	/// Returns the number of bytes actually read. Note that this function should not remove data
+	/// from the socket stream. Once data is actually consumed, `recv_commit()` should be called to
+	/// consume the data.
+	fn try_recv(
+		&self,
+		socket: &mut Self::TcpSocket,
+		buffer: &mut [u8],
+	) -> Result<usize, Self::Error>;
 
-    /// Consume data previously received using `try_recv()`. This dequeues the data from the socket.
-    fn recv_commit(&self, socket: &mut Self::TcpSocket, count: usize) -> Result<(), Self::Error>;
+	/// Consume data previously received using `try_recv()`. This dequeues the data from the socket.
+	fn recv_commit(&self, socket: &mut Self::TcpSocket, count: usize) -> Result<(), Self::Error>;
 
-    /// Read data directly from the stack RX buffer. Note that the default implementation will
-    /// instantiate a buffer on the stack for cases where reading directly from the stack RX buffer is
-    /// not possible.
-    fn read_from<F>(&self, mut socket: &mut Self::TcpSocket, f: F) -> Result<(), Self::Error>
-    where
-        F: FnOnce(&[u8]) -> usize
-    {
-        let mut buffer: GenericArray<u8, Self::Size> = GenericArray::default();
+	/// Read data directly from the stack RX buffer. Note that the default implementation will
+	/// instantiate a buffer on the stack for cases where reading directly from the stack RX buffer is
+	/// not possible.
+	fn read_from<F>(&self, mut socket: &mut Self::TcpSocket, f: F) -> Result<(), Self::Error>
+	where
+		F: FnOnce(&[u8]) -> usize,
+	{
+		let mut buffer: GenericArray<u8, Self::Size> = GenericArray::default();
 
-        let len = self.try_recv(&mut socket, &mut buffer)?;
-        let read_size = f(&buffer[..len]);
-        self.recv_commit(&mut socket, read_size)?;
+		let len = self.try_recv(&mut socket, &mut buffer)?;
+		let read_size = f(&buffer[..len]);
+		self.recv_commit(&mut socket, read_size)?;
 
-        Ok(())
-    }
+		Ok(())
+	}
 
 	/// Close an existing TCP socket.
 	fn close(&self, socket: Self::TcpSocket) -> Result<(), Self::Error>;
