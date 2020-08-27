@@ -20,3 +20,4 @@ categories = ["embedded", "hardware-support", "no-std", "network-programming"]
 nb = "1"
 no-std-net = "0.4"
 heapless = "^0.5"
+generic-array = "0.14.0"
