@@ -84,16 +84,16 @@ pub trait UdpStack {
 
 	/// Read a datagram the remote host has sent to us.
 	///
-	/// Returns `Ok(n)`, which means a datagram of size `n` has been received
-	/// and it has been placed in `&buffer[0..n]`, or an error. If a packet has
-	/// not been received when called, then
+	/// Returns `Ok((n, remote))`, which means a datagram of size `n` has been
+	/// received from `remote` and been placed in `&buffer[0..n]`, or an error.
+	/// If a packet has not been received when called, then
 	/// [`nb::Error::WouldBlock`](https://docs.rs/nb/1.0.0/nb/enum.Error.html#variant.WouldBlock)
 	/// should be returned.
 	fn read(
 		&self,
 		socket: &mut Self::UdpSocket,
 		buffer: &mut [u8],
-	) -> nb::Result<usize, Self::Error>;
+	) -> nb::Result<(usize, SocketAddr), Self::Error>;
 
 	/// Close an existing UDP socket.
 	fn close(&self, socket: Self::UdpSocket) -> Result<(), Self::Error>;
