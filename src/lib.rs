@@ -47,9 +47,13 @@ pub trait TcpStack {
 	/// (which may be less than `buffer.len()`), or an error.
 	fn write(&self, socket: &mut Self::TcpSocket, buffer: &[u8]) -> nb::Result<usize, Self::Error>;
 
-	/// Read from the stream. Returns `Ok(n)`, which means `n` bytes of
-	/// data have been received and they have been placed in
-	/// `&buffer[0..n]`, or an error.
+	/// Read from the stream.
+	///
+	/// Returns `Ok(n)`, which means `n` bytes of data have been received and
+	/// they have been placed in `&buffer[0..n]`, or an error. If a packet has
+	/// not been received when called, then
+	/// [`nb::Error::WouldBlock`](https://docs.rs/nb/1.0.0/nb/enum.Error.html#variant.WouldBlock)
+	/// should be returned.
 	fn read(
 		&self,
 		socket: &mut Self::TcpSocket,
@@ -78,9 +82,13 @@ pub trait UdpStack {
 	/// Send a datagram to the remote host.
 	fn write(&self, socket: &mut Self::UdpSocket, buffer: &[u8]) -> nb::Result<(), Self::Error>;
 
-	/// Read a datagram the remote host has sent to us. Returns `Ok(n)`, which
-	/// means a datagram of size `n` has been received and it has been placed
-	/// in `&buffer[0..n]`, or an error.
+	/// Read a datagram the remote host has sent to us.
+	///
+	/// Returns `Ok(n)`, which means a datagram of size `n` has been received
+	/// and it has been placed in `&buffer[0..n]`, or an error. If a packet has
+	/// not been received when called, then
+	/// [`nb::Error::WouldBlock`](https://docs.rs/nb/1.0.0/nb/enum.Error.html#variant.WouldBlock)
+	/// should be returned.
 	fn read(
 		&self,
 		socket: &mut Self::UdpSocket,
