@@ -65,11 +65,19 @@ pub trait UdpStack {
 	/// The type returned when we have an error
 	type Error: core::fmt::Debug;
 
-	/// Open a local port on a new UDP socket to the given address and port.
+	/// Open a UDP socket with a dynamically selected port.
+	///
+	/// Selects a port number automatically and opens a UDP socket to the given
+	/// address. UDP is connectionless, so unlike `TcpStack` no `connect()` is
+	/// required.
+	fn open(&self, remote: SocketAddr, mode: Mode) -> Result<Self::UdpSocket, Self::Error>;
+
+	/// Open a new UDP socket with a specified port
+	///
+	/// Opens a new socket with the specified port number to the given address.
 	/// UDP is connectionless, so unlike `TcpStack` no `connect()` is required.
-	fn open(
+	fn bind(
 		&self,
-		local_port: u16,
 		remote: SocketAddr,
 	) -> Result<Self::UdpSocket, Self::Error>;
 

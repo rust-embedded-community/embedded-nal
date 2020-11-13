@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Ability to specify a local UDP port
 ### Changed
 - Changed the `UdpStack::receive` method to return the packet sender address, along with the packet length
 ### Removed
