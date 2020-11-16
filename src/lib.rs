@@ -65,21 +65,16 @@ pub trait UdpStack {
 	/// The type returned when we have an error
 	type Error: core::fmt::Debug;
 
-	/// Create a new socket
-	///
-	/// Allocates a socket for use as a client or a server.
-	fn socket(&self) -> Result<Self::UdpSocket, Self::Error>;
-
 	/// Open a UDP socket with a dynamically selected port.
 	///
 	/// Selects a port number automatically and initializes for read/writing.
-	fn connect(&self, socket: &mut Self::UdpSocket, remote: SocketAddr) -> Result<(), Self::Error>;
+	fn connect(&self, remote: SocketAddr) -> Result<Self::UdpSocket, Self::Error>;
 
 	/// Send a datagram to the remote host.
 	///
 	/// The remote host used is either the one specified in `UdpStack::connect`
 	/// or the last one used in `UdpServerStack::write_to`.
-	fn write(&self, socket: &mut Self::UdpSocket, buffer: &[u8]) -> nb::Result<(), Self::Error>;
+	fn send(&self, socket: &mut Self::UdpSocket, buffer: &[u8]) -> nb::Result<(), Self::Error>;
 
 	/// Read a datagram the remote host has sent to us.
 	///
@@ -88,7 +83,7 @@ pub trait UdpStack {
 	/// If a packet has not been received when called, then
 	/// [`nb::Error::WouldBlock`](https://docs.rs/nb/1.0.0/nb/enum.Error.html#variant.WouldBlock)
 	/// should be returned.
-	fn read(
+	fn receive(
 		&self,
 		socket: &mut Self::UdpSocket,
 		buffer: &mut [u8],
@@ -104,10 +99,10 @@ pub trait UdpServerStack: UdpStack {
 	/// Open a new UDP socket with a specified port
 	///
 	/// Opens a new socket with the specified port number to the given address.
-	fn bind(&self, socket: &mut Self::UdpSocket, local_port: u16) -> Result<(), Self::Error>;
+	fn bind(&self, local_port: u16) -> Result<Self::UdpSocket, Self::Error>;
 
 	/// Send a packet to a remote host/port.
-	fn write_to(
+	fn send_to(
 		&self,
 		socket: &mut Self::UdpSocket,
 		remote: SocketAddr,
