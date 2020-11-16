@@ -10,16 +10,6 @@ pub use dns::{AddrType, Dns};
 
 pub use no_std_net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, SocketAddrV6};
 
-/// Whether a socket should block when a read/write can't be performed, or return early.
-pub enum Mode {
-	/// The function call will wait as long as necessary to complete the operation
-	Blocking,
-	/// The function call will not wait at all to complete the operation, and only do what it can.
-	NonBlocking,
-	/// The function call will wait only up the given number of milliseconds to complete the operation.
-	Timeout(u16),
-}
-
 /// This trait is implemented by TCP/IP stacks. You could, for example, have an implementation
 /// which knows how to send AT commands to an ESP8266 WiFi module. You could have another implemenation
 /// which knows how to driver the Rust Standard Library's `std::net` module. Given this trait, you can how
@@ -31,7 +21,7 @@ pub trait TcpStack {
 	type Error: core::fmt::Debug;
 
 	/// Open a new TCP socket. The socket starts in the unconnected state.
-	fn open(&self, mode: Mode) -> Result<Self::TcpSocket, Self::Error>;
+	fn open(&self) -> Result<Self::TcpSocket, Self::Error>;
 
 	/// Connect to the given remote host and port.
 	fn connect(
@@ -77,7 +67,7 @@ pub trait UdpStack {
 
 	/// Open a new UDP socket to the given address and port. UDP is connectionless,
 	/// so unlike `TcpStack` no `connect()` is required.
-	fn open(&self, remote: SocketAddr, mode: Mode) -> Result<Self::UdpSocket, Self::Error>;
+	fn open(&self, remote: SocketAddr) -> Result<Self::UdpSocket, Self::Error>;
 
 	/// Send a datagram to the remote host.
 	fn write(&self, socket: &mut Self::UdpSocket, buffer: &[u8]) -> nb::Result<(), Self::Error>;
