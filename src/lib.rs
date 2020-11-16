@@ -65,23 +65,20 @@ pub trait UdpStack {
 	/// The type returned when we have an error
 	type Error: core::fmt::Debug;
 
+	/// Create a new socket
+	///
+	/// Allocates a socket for use as a client or a server.
+	fn socket(&self) -> Result<Self::UdpSocket, Self::Error>;
+
 	/// Open a UDP socket with a dynamically selected port.
 	///
-	/// Selects a port number automatically and opens a UDP socket to the given
-	/// address. UDP is connectionless, so unlike `TcpStack` no `connect()` is
-	/// required.
-	fn open(&self, remote: SocketAddr, mode: Mode) -> Result<Self::UdpSocket, Self::Error>;
-
-	/// Open a new UDP socket with a specified port
-	///
-	/// Opens a new socket with the specified port number to the given address.
-	/// UDP is connectionless, so unlike `TcpStack` no `connect()` is required.
-	fn bind(
-		&self,
-		remote: SocketAddr,
-	) -> Result<Self::UdpSocket, Self::Error>;
+	/// Selects a port number automatically and initializes for read/writing.
+	fn connect(&self, socket: &mut Self::UdpSocket, remote: SocketAddr) -> Result<(), Self::Error>;
 
 	/// Send a datagram to the remote host.
+	///
+	/// The remote host used is either the one specified in `UdpStack::connect`
+	/// or the last one used in `UdpServerStack::write_to`.
 	fn write(&self, socket: &mut Self::UdpSocket, buffer: &[u8]) -> nb::Result<(), Self::Error>;
 
 	/// Read a datagram the remote host has sent to us.
@@ -99,6 +96,23 @@ pub trait UdpStack {
 
 	/// Close an existing UDP socket.
 	fn close(&self, socket: Self::UdpSocket) -> Result<(), Self::Error>;
+}
+
+/// This trait is implemented by UDP/IP stacks.  It provides the ability to
+/// listen for packets on a specified port and send replies.
+pub trait UdpServerStack: UdpStack {
+	/// Open a new UDP socket with a specified port
+	///
+	/// Opens a new socket with the specified port number to the given address.
+	fn bind(&self, socket: &mut Self::UdpSocket, local_port: u16) -> Result<(), Self::Error>;
+
+	/// Send a packet to a remote host/port.
+	fn write_to(
+		&self,
+		socket: &mut Self::UdpSocket,
+		remote: SocketAddr,
+		buffer: &[u8],
+	) -> nb::Result<(), Self::Error>;
 }
 
 // End Of File
