@@ -59,7 +59,7 @@ pub trait TcpStack {
 /// module. You could have another implemenation which knows how to driver the
 /// Rust Standard Library's `std::net` module. Given this trait, you can how
 /// write a portable CoAP client which can work with either implementation.
-pub trait UdpStack {
+pub trait UdpClient {
 	/// The type returned when we create a new UDP socket
 	type UdpSocket;
 	/// The type returned when we have an error
@@ -95,7 +95,7 @@ pub trait UdpStack {
 
 /// This trait is implemented by UDP/IP stacks.  It provides the ability to
 /// listen for packets on a specified port and send replies.
-pub trait UdpServerStack: UdpStack {
+pub trait UdpServer: UdpClient {
 	/// Open a new UDP socket with a specified port
 	///
 	/// Opens a new socket with the specified port number to the given address.
