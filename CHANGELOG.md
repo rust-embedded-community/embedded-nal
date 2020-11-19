@@ -7,9 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 ### Added
-- Ability to specify a local UDP port
+- Added a new `UdpServer` trait with server-specific methods
 ### Changed
 - Changed the `UdpStack::receive` method to return the packet sender address, along with the packet length
+- Changed the name of `UdpStack` to `UdpClient`
 ### Removed
 - Removed `Mode` enum, implementations should instead use `nb::WouldBlock`
 
