@@ -23,7 +23,7 @@ pub enum AddrType {
 ///
 /// [`TcpStack`]: crate::trait@TcpStack
 /// [`UdpStack`]: crate::trait@UdpStack
-/// [`ToSocketAddrs`]: 
+/// [`ToSocketAddrs`]:
 /// https://doc.rust-lang.org/std/net/trait.ToSocketAddrs.html
 pub trait Dns {
 	/// The type returned when we have an error
