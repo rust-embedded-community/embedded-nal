@@ -14,36 +14,43 @@ pub use no_std_net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, Socke
 /// which knows how to send AT commands to an ESP8266 WiFi module. You could have another implementation
 /// which knows how to driver the Rust Standard Library's `std::net` module. Given this trait, you can how
 /// write a portable HTTP client which can work with either implementation.
-pub trait TcpStack {
+pub trait TcpClient {
 	/// The type returned when we create a new TCP socket
 	type TcpSocket;
 	/// The type returned when we have an error
 	type Error: core::fmt::Debug;
 
-	/// Open a new TCP socket. The socket starts in the unconnected state.
-	fn open(&self) -> Result<Self::TcpSocket, Self::Error>;
+	/// Open a socket for usage as a TCP client.
+	///
+	/// The socket must be connected before it can be used.
+	///
+	/// Returns `Ok(socket)` if the socket was successfully created.
+	fn socket(&self) -> Result<Self::TcpSocket, Self::Error>;
 
 	/// Connect to the given remote host and port.
+	///
+	/// Returns `Ok` if the connection was successful. Otherwise, if the connection could not be
+	/// completed immediately, this function should return [`nb::Error::WouldBlock`].
 	fn connect(
 		&self,
-		socket: Self::TcpSocket,
+		socket: &mut Self::TcpSocket,
 		remote: SocketAddr,
-	) -> Result<Self::TcpSocket, Self::Error>;
+	) -> nb::Result<(), Self::Error>;
 
 	/// Check if this socket is connected
 	fn is_connected(&self, socket: &Self::TcpSocket) -> Result<bool, Self::Error>;
 
 	/// Write to the stream. Returns the number of bytes written is returned
 	/// (which may be less than `buffer.len()`), or an error.
-	fn write(&self, socket: &mut Self::TcpSocket, buffer: &[u8]) -> nb::Result<usize, Self::Error>;
+	fn send(&self, socket: &mut Self::TcpSocket, buffer: &[u8]) -> nb::Result<usize, Self::Error>;
 
-	/// Read from the stream.
+	/// Receive data from the stream.
 	///
 	/// Returns `Ok(n)`, which means `n` bytes of data have been received and
 	/// they have been placed in `&buffer[0..n]`, or an error. If a packet has
 	/// not been received when called, then [`nb::Error::WouldBlock`]
 	/// should be returned.
-	fn read(
+	fn receive(
 		&self,
 		socket: &mut Self::TcpSocket,
 		buffer: &mut [u8],
@@ -51,6 +58,29 @@ pub trait TcpStack {
 
 	/// Close an existing TCP socket.
 	fn close(&self, socket: Self::TcpSocket) -> Result<(), Self::Error>;
+}
+
+/// This trait is implemented by TCP/IP stacks that expose TCP server functionality. TCP servers
+/// may listen for connection requests to establish multiple unique TCP connections with various
+/// clients.
+pub trait TcpServer: TcpClient {
+	/// Create a new TCP socket and bind it to the specified local port.
+	///
+	///Returns `Ok(socket)` when a new socket is successfully created and bound to the specified
+	///local port. Otherwise, an `Err(e)` variant is returned.
+	fn bind(&self, local_port: u16) -> Result<Self::TcpSocket, Self::Error>;
+
+	/// Begin listening for connection requests on a previously-bound socket.
+	///
+	/// Returns `Ok` if the socket was successfully transitioned to the listening state. Otherwise,
+	/// an `Err(e)` variant is returned.
+	fn listen(&self, socket: &mut Self::TcpSocket) -> Result<(), Self::Error>;
+
+	/// Accept an active connection request on a listening socket.
+	///
+	/// Returns `Ok(connection)` if a new connection was created. If no pending connections are
+	/// available, this function should return [`nb::Error::WouldBlock`].
+	fn accept(&self, socket: &mut Self::TcpSocket) -> nb::Result<Self::TcpSocket, Self::Error>;
 }
 
 /// This trait is implemented by UDP/IP stacks. You could, for example, have
