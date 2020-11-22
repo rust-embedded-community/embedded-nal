@@ -1,6 +1,6 @@
 [package]
 name = "embedded-nal"
-version = "0.1.0"
+version = "0.2.0" # remember to update html_root_url
 authors = [
     "Jonathan 'theJPster' Pallant <github@thejpster.org.uk>",
     "Mathias Koch <mk@blackbird.online>",

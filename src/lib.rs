@@ -1,5 +1,6 @@
 //! # embedded-nal - A Network Abstraction Layer for Embedded Systems
 
+#![doc(html_root_url = "https://docs.rs/embedded-nal/0.2.0")]
 #![no_std]
 #![deny(missing_docs)]
 #![deny(unsafe_code)]
@@ -107,5 +108,3 @@ pub trait UdpServer: UdpClient {
 		buffer: &[u8],
 	) -> nb::Result<(), Self::Error>;
 }
-
-// End Of File
