@@ -41,8 +41,7 @@ pub trait TcpStack {
 	///
 	/// Returns `Ok(n)`, which means `n` bytes of data have been received and
 	/// they have been placed in `&buffer[0..n]`, or an error. If a packet has
-	/// not been received when called, then
-	/// [`nb::Error::WouldBlock`](https://docs.rs/nb/1.0.0/nb/enum.Error.html#variant.WouldBlock)
+	/// not been received when called, then [`nb::Error::WouldBlock`]
 	/// should be returned.
 	fn read(
 		&self,
@@ -80,8 +79,7 @@ pub trait UdpClient {
 	///
 	/// Returns `Ok((n, remote))`, which means a datagram of size `n` has been
 	/// received from `remote` and been placed in `&buffer[0..n]`, or an error.
-	/// If a packet has not been received when called, then
-	/// [`nb::Error::WouldBlock`](https://docs.rs/nb/1.0.0/nb/enum.Error.html#variant.WouldBlock)
+	/// If a packet has not been received when called, then [`nb::Error::WouldBlock`]
 	/// should be returned.
 	fn receive(
 		&self,
