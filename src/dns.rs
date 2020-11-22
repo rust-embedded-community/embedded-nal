@@ -21,9 +21,9 @@ pub enum AddrType {
 /// an ip address from a hostname, or a hostname from an ip address. This means
 /// that it only deals in host address records `A` (IPv4) and `AAAA` (IPv6).
 ///
-/// [`TcpStack`]: trait.TcpStack.html
-/// [`UdpStack`]: trait.UdpStack.html
-/// [`ToSocketAddrs`]:
+/// [`TcpStack`]: crate::trait@TcpStack
+/// [`UdpStack`]: crate::trait@UdpStack
+/// [`ToSocketAddrs`]: 
 /// https://doc.rust-lang.org/std/net/trait.ToSocketAddrs.html
 pub trait Dns {
 	/// The type returned when we have an error
