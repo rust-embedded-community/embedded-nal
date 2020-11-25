@@ -40,8 +40,9 @@ pub trait TcpClient {
 	/// Check if this socket is connected
 	fn is_connected(&self, socket: &Self::TcpSocket) -> Result<bool, Self::Error>;
 
-	/// Write to the stream. Returns the number of bytes written is returned
-	/// (which may be less than `buffer.len()`), or an error.
+	/// Write to the stream.
+	///
+	/// Returns the number of bytes written (which may be less than `buffer.len()`) or an error.
 	fn send(&self, socket: &mut Self::TcpSocket, buffer: &[u8]) -> nb::Result<usize, Self::Error>;
 
 	/// Receive data from the stream.
@@ -66,9 +67,9 @@ pub trait TcpClient {
 pub trait TcpServer: TcpClient {
 	/// Create a new TCP socket and bind it to the specified local port.
 	///
-	///Returns `Ok(socket)` when a new socket is successfully created and bound to the specified
-	///local port. Otherwise, an `Err(e)` variant is returned.
-	fn bind(&self, local_port: u16) -> Result<Self::TcpSocket, Self::Error>;
+	/// Returns `Ok` when a socket is successfully bound to the specified local port. Otherwise, an
+	/// `Err(e)` variant is returned.
+	fn bind(&self, socket: &mut Self::TcpSocket, local_port: u16) -> Result<(), Self::Error>;
 
 	/// Begin listening for connection requests on a previously-bound socket.
 	///
@@ -94,10 +95,13 @@ pub trait UdpClient {
 	/// The type returned when we have an error
 	type Error: core::fmt::Debug;
 
-	/// Open a UDP socket with a dynamically selected port.
+	/// Allocate a socket for further use.
+	fn socket(&self) -> Result<Self::UdpSocket, Self::Error>;
+
+	/// Connect a UDP socket with a peer using a dynamically selected port.
 	///
 	/// Selects a port number automatically and initializes for read/writing.
-	fn connect(&self, remote: SocketAddr) -> Result<Self::UdpSocket, Self::Error>;
+	fn connect(&self, socket: &mut Self::UdpSocket, remote: SocketAddr) -> Result<(), Self::Error>;
 
 	/// Send a datagram to the remote host.
 	///
@@ -124,10 +128,8 @@ pub trait UdpClient {
 /// This trait is implemented by UDP/IP stacks.  It provides the ability to
 /// listen for packets on a specified port and send replies.
 pub trait UdpServer: UdpClient {
-	/// Open a new UDP socket with a specified port
-	///
-	/// Opens a new socket with the specified port number to the given address.
-	fn bind(&self, local_port: u16) -> Result<Self::UdpSocket, Self::Error>;
+	/// Bind a UDP socket with a specified port
+	fn bind(&self, socket: &mut Self::UdpSocket, local_port: u16) -> Result<(), Self::Error>;
 
 	/// Send a packet to a remote host/port.
 	fn send_to(
