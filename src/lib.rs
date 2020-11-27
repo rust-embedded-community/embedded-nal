@@ -81,7 +81,10 @@ pub trait TcpServer: TcpClient {
 	///
 	/// Returns `Ok(connection)` if a new connection was created. If no pending connections are
 	/// available, this function should return [`nb::Error::WouldBlock`].
-	fn accept(&self, socket: &mut Self::TcpSocket) -> nb::Result<Self::TcpSocket, Self::Error>;
+	fn accept(
+		&self,
+		socket: &mut Self::TcpSocket,
+	) -> nb::Result<(Self::TcpSocket, SocketAddr), Self::Error>;
 }
 
 /// This trait is implemented by UDP/IP stacks. You could, for example, have
