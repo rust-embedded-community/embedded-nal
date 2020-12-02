@@ -8,9 +8,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 ### Added
 - Added a new `UdpServer` trait with server-specific methods
+- Added a new `TcpServer` trait with server-specific methods
+
 ### Changed
 - Changed the `UdpStack::receive` method to return the packet sender address, along with the packet length
 - Changed the name of `UdpStack` to `UdpClient`
+- Changed name of `TcpStack` to `TcpClient`
+- Changed the `TcpCStack::connect()` function to return an `nb::Result`
+- Renamed `open()` functions to `socket()` for both stacks
+- Renamed `read()` and `write()` functions to `send()` and `receive()` respectively
+- Updated `UdpStack::connect()` to modify an existing socket
+
 ### Removed
 - Removed `Mode` enum, implementations should instead use `nb::WouldBlock`
 
