@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Changed
 - Changed the names of `UdpClient`/`TcpClient` to `UdpClientStack`/`TcpClientStack`
 - Changed the names of `UdpServer`/`TcpServer` to `UdpFullStack`/`TcpFullStack`
+- Changed the method names `Dns::gethostbyname`/`Dns::gethostbyaddr` to `Dns::get_host_by_name`/`Dns::get_host_by_address`
 
 ## [0.2.0] - 2020-12-02
 
