@@ -15,7 +15,7 @@ pub use no_std_net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, Socke
 /// which knows how to send AT commands to an ESP8266 WiFi module. You could have another implementation
 /// which knows how to driver the Rust Standard Library's `std::net` module. Given this trait, you can how
 /// write a portable HTTP client which can work with either implementation.
-pub trait TcpClient {
+pub trait TcpClientStack {
 	/// The type returned when we create a new TCP socket
 	type TcpSocket;
 	/// The type returned when we have an error
@@ -65,7 +65,7 @@ pub trait TcpClient {
 /// This trait is implemented by TCP/IP stacks that expose TCP server functionality. TCP servers
 /// may listen for connection requests to establish multiple unique TCP connections with various
 /// clients.
-pub trait TcpServer: TcpClient {
+pub trait TcpFullStack: TcpClientStack {
 	/// Create a new TCP socket and bind it to the specified local port.
 	///
 	/// Returns `Ok` when a socket is successfully bound to the specified local port. Otherwise, an
@@ -93,7 +93,7 @@ pub trait TcpServer: TcpClient {
 /// module. You could have another implementation which knows how to driver the
 /// Rust Standard Library's `std::net` module. Given this trait, you can how
 /// write a portable CoAP client which can work with either implementation.
-pub trait UdpClient {
+pub trait UdpClientStack {
 	/// The type returned when we create a new UDP socket
 	type UdpSocket;
 	/// The type returned when we have an error
@@ -131,7 +131,7 @@ pub trait UdpClient {
 
 /// This trait is implemented by UDP/IP stacks.  It provides the ability to
 /// listen for packets on a specified port and send replies.
-pub trait UdpServer: UdpClient {
+pub trait UdpFullStack: UdpClientStack {
 	/// Bind a UDP socket with a specified port
 	fn bind(&self, socket: &mut Self::UdpSocket, local_port: u16) -> Result<(), Self::Error>;
 
