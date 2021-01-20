@@ -1,15 +1,4 @@
-//! # embedded-nal - A Network Abstraction Layer for Embedded Systems
-
-#![doc(html_root_url = "https://docs.rs/embedded-nal/0.2.0")]
-#![no_std]
-#![deny(missing_docs)]
-#![deny(unsafe_code)]
-
-pub use nb;
-mod dns;
-pub use dns::{AddrType, Dns};
-
-pub use no_std_net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, SocketAddrV6};
+use no_std_net::SocketAddr;
 
 /// This trait is implemented by TCP/IP stacks. You could, for example, have an implementation
 /// which knows how to send AT commands to an ESP8266 WiFi module. You could have another implementation
