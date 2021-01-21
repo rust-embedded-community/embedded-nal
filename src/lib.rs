@@ -12,4 +12,6 @@ pub use nb;
 pub use no_std_net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, SocketAddrV6};
 
 pub use dns::{AddrType, Dns};
-pub use stack::{TcpClientStack, TcpFullStack, UdpClientStack, UdpFullStack};
+pub use stack::{
+	SharableStack, SharedStack, TcpClientStack, TcpFullStack, UdpClientStack, UdpFullStack,
+};
