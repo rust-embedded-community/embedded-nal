@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+- New optional struct [`SharedNal`](./src/stack/share.rs) that can share a single underlying implementation among several users within a thread.
+
 ### Changed
 - Changed the names of `UdpClient`/`TcpClient` to `UdpClientStack`/`TcpClientStack`
 - Changed the names of `UdpServer`/`TcpServer` to `UdpFullStack`/`TcpFullStack`
