@@ -24,9 +24,9 @@ use core::cell::RefCell;
 /// #     Ok(())
 /// #   }
 /// #   fn connect(
-/// #   	&mut self,
-/// #   	socket: &mut Self::UdpSocket,
-/// #   	remote: SocketAddr,
+/// #       &mut self,
+/// #       socket: &mut Self::UdpSocket,
+/// #       remote: SocketAddr,
 /// #   ) -> Result<(), Self::Error> {
 /// #     Ok(())
 /// #   }
@@ -34,9 +34,9 @@ use core::cell::RefCell;
 /// #     Ok(())
 /// #   }
 /// #   fn receive(
-/// #   	&mut self,
-/// #   	socket: &mut Self::UdpSocket,
-/// #   	buffer: &mut [u8],
+/// #       &mut self,
+/// #       socket: &mut Self::UdpSocket,
+/// #       buffer: &mut [u8],
 /// #   ) -> nb::Result<(usize, SocketAddr), Self::Error> {
 /// #     Ok((0, SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::new(127, 0, 0, 1), 0))))
 /// #   }
@@ -63,28 +63,28 @@ use core::cell::RefCell;
 /// # Ok::<(), ()>(())
 /// ```
 pub struct SharableStack<T> {
-	stack: RefCell<T>,
+    stack: RefCell<T>,
 }
 
 impl<T> SharableStack<T> {
-	/// Create a new SharedStack that contains and uses some other stack implementation.
-	pub fn new(stack: T) -> Self {
-		SharableStack {
-			stack: RefCell::new(stack),
-		}
-	}
+    /// Create a new SharedStack that contains and uses some other stack implementation.
+    pub fn new(stack: T) -> Self {
+        SharableStack {
+            stack: RefCell::new(stack),
+        }
+    }
 
-	/// Returns a shared reference to the driver that can be used as a first-class implementation.
-	pub fn acquire(&self) -> SharedStack<T> {
-		SharedStack { stack: &self.stack }
-	}
+    /// Returns a shared reference to the driver that can be used as a first-class implementation.
+    pub fn acquire(&self) -> SharedStack<T> {
+        SharedStack { stack: &self.stack }
+    }
 }
 
 /// Single-thread shared reference to an internal network stack implementation.
 ///
 /// This can only be created by calling [`SharableStack::acquire()`]
 pub struct SharedStack<'a, T> {
-	stack: &'a RefCell<T>,
+    stack: &'a RefCell<T>,
 }
 
 macro_rules! forward {
@@ -97,46 +97,46 @@ macro_rules! forward {
 
 impl<'a, T> UdpClientStack for SharedStack<'a, T>
 where
-	T: UdpClientStack,
+    T: UdpClientStack,
 {
-	type Error = T::Error;
-	type UdpSocket = T::UdpSocket;
+    type Error = T::Error;
+    type UdpSocket = T::UdpSocket;
 
-	forward! {socket() -> Result<Self::UdpSocket, Self::Error>}
-	forward! {connect(socket: &mut Self::UdpSocket, address: SocketAddr) -> Result<(), Self::Error>}
-	forward! {send(socket: &mut Self::UdpSocket, data: &[u8]) -> Result<(), nb::Error<<T as UdpClientStack>::Error>>}
-	forward! {receive(socket: &mut Self::UdpSocket, data: &mut [u8]) -> Result<(usize, SocketAddr), nb::Error<<T as UdpClientStack>::Error>>}
-	forward! {close(socket: Self::UdpSocket) -> Result<(), Self::Error>}
+    forward! {socket() -> Result<Self::UdpSocket, Self::Error>}
+    forward! {connect(socket: &mut Self::UdpSocket, address: SocketAddr) -> Result<(), Self::Error>}
+    forward! {send(socket: &mut Self::UdpSocket, data: &[u8]) -> Result<(), nb::Error<<T as UdpClientStack>::Error>>}
+    forward! {receive(socket: &mut Self::UdpSocket, data: &mut [u8]) -> Result<(usize, SocketAddr), nb::Error<<T as UdpClientStack>::Error>>}
+    forward! {close(socket: Self::UdpSocket) -> Result<(), Self::Error>}
 }
 
 impl<'a, T> UdpFullStack for SharedStack<'a, T>
 where
-	T: UdpFullStack,
+    T: UdpFullStack,
 {
-	forward! {bind(socket: &mut Self::UdpSocket, local_port: u16) -> Result<(), Self::Error>}
-	forward! {send_to(socket: &mut Self::UdpSocket, remote: SocketAddr, buffer: &[u8]) -> Result<(), nb::Error<<T as UdpClientStack>::Error>>}
+    forward! {bind(socket: &mut Self::UdpSocket, local_port: u16) -> Result<(), Self::Error>}
+    forward! {send_to(socket: &mut Self::UdpSocket, remote: SocketAddr, buffer: &[u8]) -> Result<(), nb::Error<<T as UdpClientStack>::Error>>}
 }
 
 impl<'a, T> TcpClientStack for SharedStack<'a, T>
 where
-	T: TcpClientStack,
+    T: TcpClientStack,
 {
-	type TcpSocket = T::TcpSocket;
-	type Error = T::Error;
+    type TcpSocket = T::TcpSocket;
+    type Error = T::Error;
 
-	forward! {socket() -> Result<Self::TcpSocket, Self::Error>}
-	forward! {connect(socket: &mut Self::TcpSocket, address: SocketAddr) -> Result<(), nb::Error<<T as TcpClientStack>::Error>>}
-	forward! {send(socket: &mut Self::TcpSocket, data: &[u8]) -> Result<usize, nb::Error<<T as TcpClientStack>::Error>>}
-	forward! {receive(socket: &mut Self::TcpSocket, data: &mut [u8]) -> Result<usize, nb::Error<<T as TcpClientStack>::Error>>}
-	forward! {is_connected(socket: &Self::TcpSocket) -> Result<bool, Self::Error>}
-	forward! {close(socket: Self::TcpSocket) -> Result<(), Self::Error>}
+    forward! {socket() -> Result<Self::TcpSocket, Self::Error>}
+    forward! {connect(socket: &mut Self::TcpSocket, address: SocketAddr) -> Result<(), nb::Error<<T as TcpClientStack>::Error>>}
+    forward! {send(socket: &mut Self::TcpSocket, data: &[u8]) -> Result<usize, nb::Error<<T as TcpClientStack>::Error>>}
+    forward! {receive(socket: &mut Self::TcpSocket, data: &mut [u8]) -> Result<usize, nb::Error<<T as TcpClientStack>::Error>>}
+    forward! {is_connected(socket: &Self::TcpSocket) -> Result<bool, Self::Error>}
+    forward! {close(socket: Self::TcpSocket) -> Result<(), Self::Error>}
 }
 
 impl<'a, T> TcpFullStack for SharedStack<'a, T>
 where
-	T: TcpFullStack,
+    T: TcpFullStack,
 {
-	forward! {bind(socket: &mut Self::TcpSocket, port: u16) -> Result<(), <T as TcpClientStack>::Error>}
-	forward! {listen(socket: &mut Self::TcpSocket) -> Result<(), <T as TcpClientStack>::Error>}
-	forward! {accept(socket: &mut Self::TcpSocket) -> Result<(<T as TcpClientStack>::TcpSocket, SocketAddr), nb::Error<<T as TcpClientStack>::Error>>}
+    forward! {bind(socket: &mut Self::TcpSocket, port: u16) -> Result<(), <T as TcpClientStack>::Error>}
+    forward! {listen(socket: &mut Self::TcpSocket) -> Result<(), <T as TcpClientStack>::Error>}
+    forward! {accept(socket: &mut Self::TcpSocket) -> Result<(<T as TcpClientStack>::TcpSocket, SocketAddr), nb::Error<<T as TcpClientStack>::Error>>}
 }
