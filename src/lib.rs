@@ -1,6 +1,6 @@
 //! # embedded-nal - A Network Abstraction Layer for Embedded Systems
 
-#![doc(html_root_url = "https://docs.rs/embedded-nal/0.2.0")]
+#![doc(html_root_url = "https://docs.rs/embedded-nal/0.3.0")]
 #![no_std]
 #![deny(missing_docs)]
 #![deny(unsafe_code)]
