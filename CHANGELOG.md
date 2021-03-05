@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+* None
+
+## [0.4.0] - 2021-03-05
+
+### Changed
 - Changed [`Dns`](./src/dns.rs) methods to return `nb::Result<..>` to allow non-blocking implementations.
 - Bump dependency version of `heapless` to `v0.6.1` to address security issue of sub-dependency.
 - Bump dependency version of `no-std-net` to `v0.5`.
