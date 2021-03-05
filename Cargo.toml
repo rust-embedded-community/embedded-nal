@@ -19,5 +19,5 @@ categories = ["embedded", "hardware-support", "no-std", "network-programming"]
 
 [dependencies]
 nb = "1"
-no-std-net = "0.4"
-heapless = "^0.5"
+no-std-net = "0.5"
+heapless = "^0.6.1"
