@@ -2,7 +2,7 @@ use no_std_net::SocketAddr;
 
 /// This trait is implemented by TCP/IP stacks. You could, for example, have an implementation
 /// which knows how to send AT commands to an ESP8266 WiFi module. You could have another implementation
-/// which knows how to driver the Rust Standard Library's `std::net` module. Given this trait, you can how
+/// which knows how to driver the Rust Standard Library's `std::net` module. Given this trait, you can
 /// write a portable HTTP client which can work with either implementation.
 pub trait TcpClientStack {
 	/// The type returned when we create a new TCP socket
