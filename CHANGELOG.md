@@ -7,7 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
-* None
+- Bump dependency version of `heapless` to `v0.7.0` to utilize const generics.
+- Bump MSRV to 1.51.0 to get `min_const_generics` for `heapless`.
 
 ## [0.4.0] - 2021-03-05
 
