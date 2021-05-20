@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+* None
+
+## [0.5.0] - 2021-05-20
+
+### Changed
+
 - Bump dependency version of `heapless` to `v0.7.0` to utilize const generics.
 - Bump MSRV to 1.51.0 to get `min_const_generics` for `heapless`.
 
@@ -52,7 +58,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 Initial release to crates.io.
 
-[Unreleased]: https://github.com/rust-embedded-community/embedded-nal/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/rust-embedded-community/embedded-nal/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/rust-embedded-community/embedded-nal/compare/v0.4.0...v0.5.0
+[0.4.0]: https://github.com/rust-embedded-community/embedded-nal/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/rust-embedded-community/embedded-nal/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/rust-embedded-community/embedded-nal/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/rust-embedded-community/embedded-nal/releases/tag/v0.1.0
