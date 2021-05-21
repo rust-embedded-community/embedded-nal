@@ -32,7 +32,7 @@ pub trait Dns {
 	/// Resolve the first ip address of a host, given its hostname and a desired
 	/// address record type to look for
 	fn get_host_by_name(
-		&self,
+		&mut self,
 		hostname: &str,
 		addr_type: AddrType,
 	) -> nb::Result<IpAddr, Self::Error>;
@@ -43,5 +43,5 @@ pub trait Dns {
 	/// 255 bytes [`rfc1035`]
 	///
 	/// [`rfc1035`]: https://tools.ietf.org/html/rfc1035
-	fn get_host_by_address(&self, addr: IpAddr) -> nb::Result<String<256>, Self::Error>;
+	fn get_host_by_address(&mut self, addr: IpAddr) -> nb::Result<String<256>, Self::Error>;
 }
