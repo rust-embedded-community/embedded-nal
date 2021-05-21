@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
-* None
+- Changed self references in dns stack methods to mutable, to follow the network stack implementations.
 
 ## [0.5.0] - 2021-05-20
 
