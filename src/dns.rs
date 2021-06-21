@@ -28,14 +28,16 @@ pub enum AddrType {
 pub trait Dns {
 	/// The type returned when we have an error
 	type Error: core::fmt::Debug;
+	/// An iterator of IP addresses.
+	type IpAddrIter: Iterator<Item = IpAddr>;
 
-	/// Resolve the first ip address of a host, given its hostname and a desired
-	/// address record type to look for
+	/// Resolves the IP addresses associated with a host, given its hostname and a desired
+	/// address record type to look for.
 	fn get_host_by_name(
 		&mut self,
 		hostname: &str,
 		addr_type: AddrType,
-	) -> nb::Result<IpAddr, Self::Error>;
+	) -> nb::Result<Self::IpAddrIter, Self::Error>;
 
 	/// Resolve the hostname of a host, given its ip address
 	///
