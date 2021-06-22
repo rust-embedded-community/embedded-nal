@@ -1,6 +1,3 @@
-use core::mem::MaybeUninit;
-
-use heapless::String;
 use no_std_net::IpAddr;
 
 /// This is the host address type to be returned by `gethostbyname`.
@@ -27,19 +24,17 @@ pub enum AddrType {
 /// [`UdpStack`]: crate::trait@UdpStack
 /// [`ToSocketAddrs`]:
 /// https://doc.rust-lang.org/std/net/trait.ToSocketAddrs.html
-pub trait Dns<'a> {
+pub trait Dns {
 	/// The type returned when we have an error
 	type Error: core::fmt::Debug;
-	/// The iterator returned by `get_hosts_by_name`.
-	type IpAddrIter: Iterator<Item = IpAddr> + 'a;
 
 	/// Resolves the IP addresses associated with a host, given its hostname and a desired
 	/// address record type to look for.
-	fn get_hosts_by_name(
-		&'a mut self,
-		hostname: &'a str,
+	fn get_hosts_by_name<const UP_TO: usize>(
+		&mut self,
+		hostname: &str,
 		addr_type: AddrType,
-	) -> Result<Self::IpAddrIter, Self::Error>;
+	) -> Result<heapless::Vec<IpAddr, UP_TO>, Self::Error>;
 
 	/// Resolve the hostname of a host, given its ip address
 	///
@@ -47,5 +42,5 @@ pub trait Dns<'a> {
 	/// 255 bytes [`rfc1035`]
 	///
 	/// [`rfc1035`]: https://tools.ietf.org/html/rfc1035
-	fn get_host_by_address(&mut self, addr: IpAddr) -> Result<String<256>, Self::Error>;
+	fn get_host_by_address(&mut self, addr: IpAddr) -> Result<heapless::String<256>, Self::Error>;
 }
