@@ -27,18 +27,19 @@ pub enum AddrType {
 /// [`UdpStack`]: crate::trait@UdpStack
 /// [`ToSocketAddrs`]:
 /// https://doc.rust-lang.org/std/net/trait.ToSocketAddrs.html
-pub trait Dns {
+pub trait Dns<'a> {
 	/// The type returned when we have an error
 	type Error: core::fmt::Debug;
+	/// The iterator returned by `get_hosts_by_name`.
+	type IpAddrIter: Iterator<Item = IpAddr> + 'a;
 
 	/// Resolves the IP addresses associated with a host, given its hostname and a desired
 	/// address record type to look for.
-	fn get_hosts_by_name<'a>(
-		&mut self,
-		hostname: &str,
+	fn get_hosts_by_name(
+		&'a mut self,
+		hostname: &'a str,
 		addr_type: AddrType,
-		outputs: &'a mut [MaybeUninit<IpAddr>],
-	) -> Result<&'a [IpAddr], Self::Error>;
+	) -> Result<Self::IpAddrIter, Self::Error>;
 
 	/// Resolve the hostname of a host, given its ip address
 	///
