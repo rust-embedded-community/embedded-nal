@@ -1,3 +1,5 @@
+use core::mem::MaybeUninit;
+
 use heapless::String;
 use no_std_net::IpAddr;
 
@@ -28,16 +30,15 @@ pub enum AddrType {
 pub trait Dns {
 	/// The type returned when we have an error
 	type Error: core::fmt::Debug;
-	/// An iterator of IP addresses.
-	type IpAddrIter: Iterator<Item = IpAddr>;
 
 	/// Resolves the IP addresses associated with a host, given its hostname and a desired
 	/// address record type to look for.
-	fn get_host_by_name(
+	fn get_hosts_by_name<'a>(
 		&mut self,
 		hostname: &str,
 		addr_type: AddrType,
-	) -> nb::Result<Self::IpAddrIter, Self::Error>;
+		outputs: &'a mut [MaybeUninit<IpAddr>],
+	) -> Result<&'a [IpAddr], Self::Error>;
 
 	/// Resolve the hostname of a host, given its ip address
 	///
@@ -45,5 +46,5 @@ pub trait Dns {
 	/// 255 bytes [`rfc1035`]
 	///
 	/// [`rfc1035`]: https://tools.ietf.org/html/rfc1035
-	fn get_host_by_address(&mut self, addr: IpAddr) -> nb::Result<String<256>, Self::Error>;
+	fn get_host_by_address(&mut self, addr: IpAddr) -> Result<String<256>, Self::Error>;
 }
