@@ -45,3 +45,19 @@ pub trait Dns {
 	/// [`rfc1035`]: https://tools.ietf.org/html/rfc1035
 	fn get_host_by_address(&mut self, addr: IpAddr) -> nb::Result<String<256>, Self::Error>;
 }
+
+impl<T: Dns> Dns for &mut T {
+	type Error = T::Error;
+
+	fn get_host_by_name(
+		&mut self,
+		hostname: &str,
+		addr_type: AddrType,
+	) -> nb::Result<IpAddr, Self::Error> {
+		T::get_host_by_name(self, hostname, addr_type)
+	}
+
+	fn get_host_by_address(&mut self, addr: IpAddr) -> nb::Result<String<256>, Self::Error> {
+		T::get_host_by_address(self, addr)
+	}
+}

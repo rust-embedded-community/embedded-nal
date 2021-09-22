@@ -80,3 +80,45 @@ pub trait TcpFullStack: TcpClientStack {
 		socket: &mut Self::TcpSocket,
 	) -> nb::Result<(Self::TcpSocket, SocketAddr), Self::Error>;
 }
+
+impl<T: TcpClientStack> TcpClientStack for &mut T {
+	type Error = T::Error;
+
+	type TcpSocket = T::TcpSocket;
+
+	fn socket(&mut self) -> Result<Self::TcpSocket, Self::Error> {
+		T::socket(self)
+	}
+
+	fn connect(
+		&mut self,
+		socket: &mut Self::TcpSocket,
+		remote: SocketAddr,
+	) -> nb::Result<(), Self::Error> {
+		T::connect(self, socket, remote)
+	}
+
+	fn is_connected(&mut self, socket: &Self::TcpSocket) -> Result<bool, Self::Error> {
+		T::is_connected(self, socket)
+	}
+
+	fn send(
+		&mut self,
+		socket: &mut Self::TcpSocket,
+		buffer: &[u8],
+	) -> nb::Result<usize, Self::Error> {
+		T::send(self, socket, buffer)
+	}
+
+	fn receive(
+		&mut self,
+		socket: &mut Self::TcpSocket,
+		buffer: &mut [u8],
+	) -> nb::Result<usize, Self::Error> {
+		T::receive(self, socket, buffer)
+	}
+
+	fn close(&mut self, socket: Self::TcpSocket) -> Result<(), Self::Error> {
+		T::close(self, socket)
+	}
+}
