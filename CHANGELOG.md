@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
-* None
+* Add blanket impls of all the traits for mutable references.
 
 ## [0.6.0] - 2021-05-25
 

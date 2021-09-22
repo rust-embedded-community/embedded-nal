@@ -59,3 +59,52 @@ pub trait UdpFullStack: UdpClientStack {
 		buffer: &[u8],
 	) -> nb::Result<(), Self::Error>;
 }
+
+impl<T: UdpClientStack> UdpClientStack for &mut T {
+	type Error = T::Error;
+
+	type UdpSocket = T::UdpSocket;
+
+	fn socket(&mut self) -> Result<Self::UdpSocket, Self::Error> {
+		T::socket(self)
+	}
+
+	fn connect(
+		&mut self,
+		socket: &mut Self::UdpSocket,
+		remote: SocketAddr,
+	) -> Result<(), Self::Error> {
+		T::connect(self, socket, remote)
+	}
+
+	fn send(&mut self, socket: &mut Self::UdpSocket, buffer: &[u8]) -> nb::Result<(), Self::Error> {
+		T::send(self, socket, buffer)
+	}
+
+	fn receive(
+		&mut self,
+		socket: &mut Self::UdpSocket,
+		buffer: &mut [u8],
+	) -> nb::Result<(usize, SocketAddr), Self::Error> {
+		T::receive(self, socket, buffer)
+	}
+
+	fn close(&mut self, socket: Self::UdpSocket) -> Result<(), Self::Error> {
+		T::close(self, socket)
+	}
+}
+
+impl<T: UdpFullStack> UdpFullStack for &mut T {
+	fn bind(&mut self, socket: &mut Self::UdpSocket, local_port: u16) -> Result<(), Self::Error> {
+		T::bind(self, socket, local_port)
+	}
+
+	fn send_to(
+		&mut self,
+		socket: &mut Self::UdpSocket,
+		remote: SocketAddr,
+		buffer: &[u8],
+	) -> nb::Result<(), Self::Error> {
+		T::send_to(self, socket, remote, buffer)
+	}
+}
