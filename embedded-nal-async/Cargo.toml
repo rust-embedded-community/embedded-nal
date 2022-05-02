@@ -1,0 +1,24 @@
+[package]
+name = "embedded-nal-async"
+version = "0.1.0" # remember to update html_root_url
+authors = [
+    "Jonathan 'theJPster' Pallant <github@thejpster.org.uk>",
+    "Mathias Koch <mk@blackbird.online>",
+    "Diego Barrios Romero <eldruin@gmail.com>",
+    "Ryan Summers <ryan.summers@vertigo-designs.com>",
+    "Ulf Lilleengen <lulf@redhat.com>",
+]
+edition = "2018"
+description = "An Async Network Abstraction Layer (NAL) for Embedded Systems"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/rust-embedded-community/embedded-nal"
+homepage = "https://github.com/rust-embedded-community/embedded-nal"
+documentation = "https://docs.rs/embedded-nal-async"
+readme = "README.md"
+keywords = ["network"]
+categories = ["embedded", "hardware-support", "no-std", "network-programming", "async"]
+
+[dependencies]
+no-std-net = "0.5"
+heapless = "^0.7"
+embedded-nal = { version = "0.6.0", path = "../" }
