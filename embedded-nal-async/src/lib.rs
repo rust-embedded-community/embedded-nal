@@ -1,6 +1,5 @@
 //! # embedded-nal-async - An async Network Abstraction Layer for Embedded Systems
 
-#![doc(html_root_url = "https://docs.rs/embedded-nal-async/0.1.0")]
 #![no_std]
 #![feature(generic_associated_types)]
 #![deny(missing_docs)]
@@ -8,8 +7,6 @@
 
 mod dns;
 mod stack;
-//
-//pub use nb;
 // Needed by embedded-nal trait implementers who build get_host_by_address results, or by trait
 // users who pass the results on.
 pub use heapless;
