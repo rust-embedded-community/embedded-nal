@@ -12,7 +12,7 @@ homepage = "https://github.com/rust-embedded-community/embedded-nal"
 documentation = "https://docs.rs/embedded-nal-async"
 readme = "README.md"
 keywords = ["network"]
-categories = ["embedded", "hardware-support", "no-std", "network-programming", "async"]
+categories = ["embedded", "hardware-support", "no-std", "network-programming", "asynchronous"]
 
 [dependencies]
 no-std-net = "0.5"
