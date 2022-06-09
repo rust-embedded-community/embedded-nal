@@ -10,3 +10,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.1.0] - 2022-05-04
 
 Initial release to crates.io.
+
+[Unreleased]: https://github.com/rust-embedded-community/embedded-nal/compare/embedded-nal-async-v0.1.0...HEAD
+[0.1.0]: https://github.com/rust-embedded-community/embedded-nal/releases/tag/embedded-nal-async-v0.1.0
