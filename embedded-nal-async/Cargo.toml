@@ -18,3 +18,4 @@ categories = ["embedded", "hardware-support", "no-std", "network-programming", "
 no-std-net = "0.5"
 heapless = "^0.7"
 embedded-nal = { version = "0.6.0", path = "../" }
+embedded-io = { version = "0.3.0", default-features = false, features = ["async"] }

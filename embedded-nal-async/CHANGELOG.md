@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+TcpClient trait for creating shared async TCP/IP stack implementations.
+
 ## [0.1.0] - 2022-05-04
 
 Initial release to crates.io.
