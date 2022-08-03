@@ -1,5 +1,5 @@
 mod tcp;
 mod udp;
 
-pub use tcp::{TcpClientStack, TcpConnect, TcpFullStack};
+pub use tcp::TcpConnect;
 pub use udp::{UdpClientStack, UdpFullStack};
