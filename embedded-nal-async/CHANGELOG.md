@@ -7,7 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.2.0] - 2022-08-03
+
 TcpClient trait for creating shared async TCP/IP stack implementations.
+Remove TcpClientStack, TcpFullStack and UDP traits pending traits that support shared use.
 
 ## [0.1.0] - 2022-05-04
 
