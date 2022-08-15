@@ -1,3 +1,18 @@
+//! Traits for using UDP on embedded devices
+//!
+//! ## Notes for implementers
+//!
+//! * At several places, the APIs expect to provide a local address. Backends that can not obtain
+//!   it, such as some AT-command based stacks, <!-- should question whether they may really call
+//!   themselves UDP and --> may pretend to have performed some form of network address
+//!   translation, and present invalid addresses as the local address.
+//!
+//! * Implementing [`UdpStack::Bound`] and [`UdpStack::Unbound`] unconnected sockets separately
+//!   allows discarding the local addresses in the bound case. With LTO enabled, all the overhead
+//!   compared with a third trait variant between [ConnectedUdp] and [UnconnectedUdp] (in which the
+//!   local address is static but the remote address is flexible) should optimized out.
+//!   Implementing `Bound` and `Unbound` with the same type is expected to be a common choice.
+
 use core::future::Future;
 use no_std_net::SocketAddr;
 
@@ -48,53 +63,17 @@ pub trait ConnectedUdp {
 
 /// This trait is implemented by UDP sockets.
 ///
-/// The socket it represents is both bound (has a local IP address, port and interface) but not
-/// connected; its peer IP address is explicit in every call.
+/// The socket it represents is not necessarily bound (may not have a single local IP address, port
+/// and interface), and is typically not connected (has no remote IP address and port). Both are
+/// addresses are explicitly given in every call.
 ///
-/// This is similar to a POSIX datagram socket that has been bound to a concrete address.
-pub trait BoundUdp {
+/// If there were constraints in place at socket creation time (typically on the local side), the
+/// caller MUST pass in the same (or compatible) values, MAY and pass in unspecified values where
+/// applicable. The implementer MAY check them for compatibility, and SHOULD do that in debug mode.
+pub trait UnconnectedUdp {
 	type Error: embedded_io::Error;
 
-	/// Send the provided data to the connected peer
-	fn send_to(&mut self, remote: SocketAddr, data: &[u8]) -> Self::SendToFuture<'_>;
-	type SendToFuture<'a>: Future<Output = Result<(), Self::Error>>
-	where
-		Self: 'a;
-
-	/// Receive a datagram into the provided buffer.
-	///
-	/// If the received datagram exceeds the buffer's length, it is received regardless, and the
-	/// remaining bytes are discarded. The full datagram size is still indicated in the result,
-	/// allowing the recipient to detect that truncation.
-	///
-	/// The remote address is given in the result along with the number of bytes.
-	///
-	/// ## Compatibility note
-	///
-	/// This deviates from the sync/nb equivalent trait in that it describes the overflow behavior
-	/// (a possibility not considered there). The name deviates from the original `receive()` to
-	/// make room for a version that is more zero-copy friendly.
-	fn receive_from_into(&mut self, buffer: &mut [u8]) -> Self::ReceiveFromIntoFuture<'_>;
-	type ReceiveFromIntoFuture<'a>: Future<Output = Result<(usize, SocketAddr), Self::Error>>
-	where
-		Self: 'a;
-}
-
-/// This trait is implemented by UDP sockets.
-///
-/// The socket it represents is neither bound (has no single local IP address, port and interface)
-/// nor connected (has no remote IP address and port). Both are explicitly given in every call.
-///
-/// There may be constraints placed on an unbound socket at creation time that limit the range of
-/// local addresses (further than the natural limitation of only using addresses assigned to the
-/// host).
-///
-/// A typical example of this kind of socket is a POSIX datagram socket that has been bound to
-/// "any" address (`[::]` or `0.0.0.0`) but to a particular port.
-pub trait UnboundUdp {
-	type Error: embedded_io::Error;
-
-	/// Send the provided data to the connected peer
+	/// Send the provided data to a peer
 	///
 	/// ## Sending initial messages
 	///
@@ -110,6 +89,13 @@ pub trait UnboundUdp {
 	/// sending from the address to which the original datagram was addressed, or from an unbound
 	/// address. Both are valid choices in some situations, and the right choice depends on the
 	/// protocol used.
+	///
+	/// Note that users of sockets created through [`UdpSocket::bind_single()`] should always pass
+	/// in that single address -- even though they've made their intention clear at construction.
+	/// They can pass either the one obtained at socket creation time, or the one obtained at
+	/// receive time; these should be equal. This allows implementations of the trait to use a
+	/// single kind of socket for both sockets bound to a single and sockets bound to multiple
+	/// addresses.
 	fn send(&mut self, local: SocketAddr, remote: SocketAddr, data: &[u8]) -> Self::SendFuture<'_>;
 	type SendFuture<'a>: Future<Output = Result<(), Self::Error>>
 	where
@@ -141,10 +127,10 @@ pub trait UdpStack {
 	type Connected<'m>: ConnectedUdp
 	where
 		Self: 'm;
-	type Bound<'m>: BoundUdp
+	type Bound<'m>: UnconnectedUdp
 	where
 		Self: 'm;
-	type Unbound<'m>: UnboundUdp
+	type Unbound<'m>: UnconnectedUdp
 	where
 		Self: 'm;
 

@@ -2,4 +2,4 @@ mod tcp;
 mod udp;
 
 pub use tcp::TcpConnect;
-pub use udp::{BoundUdp, ConnectedUdp, UdpStack, UnboundUdp};
+pub use udp::{ConnectedUdp, UdpStack, UnconnectedUdp};
