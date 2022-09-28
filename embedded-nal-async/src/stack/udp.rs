@@ -31,7 +31,7 @@ pub trait ConnectedUdp {
 	type Error: embedded_io::Error;
 
 	/// Send the provided data to the connected peer
-	fn send(&mut self, data: &[u8]) -> Self::SendFuture<'_>;
+	fn send<'a>(&'a mut self, data: &'a [u8]) -> Self::SendFuture<'a>;
 	/// Return type of the [`.send()`] method
 	type SendFuture<'a>: Future<Output = Result<(), Self::Error>>
 	where
@@ -48,7 +48,7 @@ pub trait ConnectedUdp {
 	/// This deviates from the sync/nb equivalent trait in that it describes the overflow behavior
 	/// (a possibility not considered there). The name deviates from the original `receive()` to
 	/// make room for a version that is more zero-copy friendly.
-	fn receive_into(&mut self, buffer: &mut [u8]) -> Self::ReceiveIntoFuture<'_>;
+	fn receive_into<'a>(&'a mut self, buffer: &'a mut [u8]) -> Self::ReceiveIntoFuture<'a>;
 	/// Return type of the [`.receive_into()`] method
 	type ReceiveIntoFuture<'a>: Future<Output = Result<usize, Self::Error>>
 	where
@@ -100,7 +100,12 @@ pub trait UnconnectedUdp {
 	/// receive time; these should be equal. This allows implementations of the trait to use a
 	/// single kind of socket for both sockets bound to a single and sockets bound to multiple
 	/// addresses.
-	fn send(&mut self, local: SocketAddr, remote: SocketAddr, data: &[u8]) -> Self::SendFuture<'_>;
+	fn send<'a>(
+		&'a mut self,
+		local: SocketAddr,
+		remote: SocketAddr,
+		data: &'a [u8],
+	) -> Self::SendFuture<'a>;
 	/// Return type of the [`.send()`] method
 	type SendFuture<'a>: Future<Output = Result<(), Self::Error>>
 	where
@@ -114,7 +119,7 @@ pub trait UnconnectedUdp {
 	///
 	/// The local and remote address are given, in that order, in the result along with the number
 	/// of bytes.
-	fn receive_into(&mut self, buffer: &mut [u8]) -> Self::ReceiveIntoFuture<'_>;
+	fn receive_into<'a>(&'a mut self, buffer: &'a mut [u8]) -> Self::ReceiveIntoFuture<'a>;
 	/// Return type of the [`.receive_into()`] method
 	type ReceiveIntoFuture<'a>: Future<
 		Output = Result<(usize, SocketAddr, SocketAddr), Self::Error>,
