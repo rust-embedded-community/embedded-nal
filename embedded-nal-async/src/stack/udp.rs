@@ -27,10 +27,12 @@ use no_std_net::SocketAddr;
 /// `bind()` call in the creation of such sockets, these are implicitly bound to a suitable local
 /// address at connect time.
 pub trait ConnectedUdp {
+	/// Error type returned by send and receive operations.
 	type Error: embedded_io::Error;
 
 	/// Send the provided data to the connected peer
 	fn send(&mut self, data: &[u8]) -> Self::SendFuture<'_>;
+	/// Return type of the [`.send()`] method
 	type SendFuture<'a>: Future<Output = Result<(), Self::Error>>
 	where
 		Self: 'a;
@@ -47,6 +49,7 @@ pub trait ConnectedUdp {
 	/// (a possibility not considered there). The name deviates from the original `receive()` to
 	/// make room for a version that is more zero-copy friendly.
 	fn receive_into(&mut self, buffer: &mut [u8]) -> Self::ReceiveIntoFuture<'_>;
+	/// Return type of the [`.receive_into()`] method
 	type ReceiveIntoFuture<'a>: Future<Output = Result<usize, Self::Error>>
 	where
 		Self: 'a;
@@ -71,6 +74,7 @@ pub trait ConnectedUdp {
 /// caller MUST pass in the same (or compatible) values, MAY and pass in unspecified values where
 /// applicable. The implementer MAY check them for compatibility, and SHOULD do that in debug mode.
 pub trait UnconnectedUdp {
+	/// Error type returned by send and receive operations.
 	type Error: embedded_io::Error;
 
 	/// Send the provided data to a peer
@@ -90,13 +94,14 @@ pub trait UnconnectedUdp {
 	/// address. Both are valid choices in some situations, and the right choice depends on the
 	/// protocol used.
 	///
-	/// Note that users of sockets created through [`UdpSocket::bind_single()`] should always pass
+	/// Note that users of sockets created through [`UdpStack::bind_single()`] should always pass
 	/// in that single address -- even though they've made their intention clear at construction.
 	/// They can pass either the one obtained at socket creation time, or the one obtained at
 	/// receive time; these should be equal. This allows implementations of the trait to use a
 	/// single kind of socket for both sockets bound to a single and sockets bound to multiple
 	/// addresses.
 	fn send(&mut self, local: SocketAddr, remote: SocketAddr, data: &[u8]) -> Self::SendFuture<'_>;
+	/// Return type of the [`.send()`] method
 	type SendFuture<'a>: Future<Output = Result<(), Self::Error>>
 	where
 		Self: 'a;
@@ -109,9 +114,11 @@ pub trait UnconnectedUdp {
 	///
 	/// The local and remote address are given, in that order, in the result along with the number
 	/// of bytes.
-	fn receive(&mut self, buffer: &mut [u8]) -> Self::ReceiveFuture<'_>;
-	type ReceiveFuture<'a>: Future<Output = Result<(usize, SocketAddr, SocketAddr), Self::Error>>
-	where
+	fn receive_into(&mut self, buffer: &mut [u8]) -> Self::ReceiveIntoFuture<'_>;
+	/// Return type of the [`.receive_into()`] method
+	type ReceiveIntoFuture<'a>: Future<
+		Output = Result<(usize, SocketAddr, SocketAddr), Self::Error>,
+	> where
 		Self: 'a;
 }
 
@@ -124,12 +131,15 @@ pub trait UdpStack {
 	/// Error type returned on socket creation failure.
 	type Error: embedded_io::Error;
 
+	/// Eventual socket return type of the [`.connect()`] method
 	type Connected<'m>: ConnectedUdp
 	where
 		Self: 'm;
+	/// Eventual socket return type of the [`.bind_single()`] method
 	type Bound<'m>: UnconnectedUdp
 	where
 		Self: 'm;
+	/// Eventual return type of the [`.bind_multiple()`] method
 	type Unbound<'m>: UnconnectedUdp
 	where
 		Self: 'm;
@@ -140,8 +150,9 @@ pub trait UdpStack {
 	///
 	/// While asynchronous traits implemented through GAT can not have provided default methods,
 	/// implementers are encouraged to use the hidden `.connect_default()` method if all they would
-	/// do is delegating to [`connect_from`] with a suitable unspecified local address.
+	/// do is delegating to [`.connect_from`] with a suitable unspecified local address.
 	fn connect(&self, remote: SocketAddr) -> Self::ConnectFuture<'_>;
+	/// Future return type of the [`.connect()`] method
 	type ConnectFuture<'a>: Future<Output = Result<(SocketAddr, Self::Connected<'a>), Self::Error>>
 	where
 		Self: 'a;
@@ -152,6 +163,7 @@ pub trait UdpStack {
 	/// network stack at connection time. The full local address is returned along with the
 	/// connected socket, primarily for debugging purposes.
 	fn connect_from(&self, local: SocketAddr, remote: SocketAddr) -> Self::ConnectFromFuture<'_>;
+	/// Future return type of the [`.connect_from()`] method
 	type ConnectFromFuture<'a>: Future<
 		Output = Result<(SocketAddr, Self::Connected<'a>), Self::Error>,
 	> where
@@ -178,6 +190,7 @@ pub trait UdpStack {
 	/// The full local address is returned along with the bound socket; it may then be passed on to
 	/// other protocols for advertising purposes.
 	fn bind_single(&self, local: SocketAddr) -> Self::BindSingleFuture<'_>;
+	/// Future return type of the [`.bind_single()`] method
 	type BindSingleFuture<'a>: Future<Output = Result<(SocketAddr, Self::Bound<'a>), Self::Error>>
 	where
 		Self: 'a;
@@ -205,6 +218,7 @@ pub trait UdpStack {
 	///   binding to `[::]:0`, that is, picking some available port but then still leaving the
 	///   interface and IP address unspecified.
 	fn bind_multiple(&self, local: SocketAddr) -> Self::BindMultipleFuture<'_>;
+	/// Future return type of the [`.bind_multiple()`] method
 	type BindMultipleFuture<'a>: Future<Output = Result<Self::Unbound<'a>, Self::Error>>
 	where
 		Self: 'a;
