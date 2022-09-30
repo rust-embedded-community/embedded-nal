@@ -7,11 +7,12 @@
 //!   themselves UDP and --> may pretend to have performed some form of network address
 //!   translation, and present invalid addresses as the local address.
 //!
-//! * Implementing [`UdpStack::Bound`] and [`UdpStack::Unbound`] unconnected sockets separately
-//!   allows discarding the local addresses in the bound case. With LTO enabled, all the overhead
-//!   compared with a third trait variant between [ConnectedUdp] and [UnconnectedUdp] (in which the
-//!   local address is static but the remote address is flexible) should optimized out.
-//!   Implementing `Bound` and `Unbound` with the same type is expected to be a common choice.
+//! * Implementing [`UdpStack::UniquelyBound`] and [`UdpStack::MultiplyBound`] unconnected sockets
+//!   separately allows discarding the local addresses in the bound case. With LTO enabled, all the
+//!   overhead compared with a third trait variant between [ConnectedUdp] and [UnconnectedUdp] (in
+//!   which the local address is static but the remote address is flexible) should optimized out.
+//!   Implementing `UniquelyBound` and `MultiplyBound` with the same type is expected to be a
+//!   common choice.
 
 use core::future::Future;
 use no_std_net::SocketAddr;
@@ -141,11 +142,11 @@ pub trait UdpStack {
 	where
 		Self: 'm;
 	/// Eventual socket return type of the [`.bind_single()`] method
-	type Bound<'m>: UnconnectedUdp
+	type UniquelyBound<'m>: UnconnectedUdp
 	where
 		Self: 'm;
 	/// Eventual return type of the [`.bind_multiple()`] method
-	type Unbound<'m>: UnconnectedUdp
+	type MultiplyBound<'m>: UnconnectedUdp
 	where
 		Self: 'm;
 
@@ -196,8 +197,9 @@ pub trait UdpStack {
 	/// other protocols for advertising purposes.
 	fn bind_single(&self, local: SocketAddr) -> Self::BindSingleFuture<'_>;
 	/// Future return type of the [`.bind_single()`] method
-	type BindSingleFuture<'a>: Future<Output = Result<(SocketAddr, Self::Bound<'a>), Self::Error>>
-	where
+	type BindSingleFuture<'a>: Future<
+		Output = Result<(SocketAddr, Self::UniquelyBound<'a>), Self::Error>,
+	> where
 		Self: 'a;
 
 	/// Create a socket that has no single fixed local address.
@@ -224,7 +226,7 @@ pub trait UdpStack {
 	///   interface and IP address unspecified.
 	fn bind_multiple(&self, local: SocketAddr) -> Self::BindMultipleFuture<'_>;
 	/// Future return type of the [`.bind_multiple()`] method
-	type BindMultipleFuture<'a>: Future<Output = Result<Self::Unbound<'a>, Self::Error>>
+	type BindMultipleFuture<'a>: Future<Output = Result<Self::MultiplyBound<'a>, Self::Error>>
 	where
 		Self: 'a;
 }
