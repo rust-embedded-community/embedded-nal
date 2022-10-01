@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## Unreleased
 
 * Add blanket impls of all the traits for mutable references.
+- Bump dependency version of `no-std-net` to `v0.6`.
 
 ## [0.6.0] - 2021-05-25
 
