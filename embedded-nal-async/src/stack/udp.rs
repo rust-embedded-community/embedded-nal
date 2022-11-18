@@ -130,21 +130,10 @@ pub trait UdpStack {
 	///
 	/// The local address is chosen automatically.
 	///
-	/// While asynchronous traits implemented through GAT can not have provided default methods,
-	/// implementers are encouraged to use the hidden `.connect_default()` method if all they would
-	/// do is delegating to [`.connect_from`] with a suitable unspecified local address.
-	async fn connect(&self, remote: SocketAddr) -> Result<(SocketAddr, Self::Connected), Self::Error>;
-
-	/// Create a socket that has a fixed remote address.
-	///
-	/// The local address is given explicitly, but may be partially unspecified; it is fixed by the
-	/// network stack at connection time. The full local address is returned along with the
-	/// connected socket, primarily for debugging purposes.
-	async fn connect_from(&self, local: SocketAddr, remote: SocketAddr) -> Result<(SocketAddr, Self::Connected), Self::Error>;
-
-	/// Helper that implements [`connect()`] using [`connect_from()`].
-	#[doc(hidden)]
-	async fn connect_default(&self, remote: SocketAddr) -> Result<(SocketAddr, Self::Connected), Self::Error> {
+    /// There is a provided implementation that implements this from the maximally unspecified
+    /// local address and [`.connect_from()`], but may be provided more efficiently by
+    /// implementers.
+	async fn connect(&self, remote: SocketAddr) -> Result<(SocketAddr, Self::Connected), Self::Error> {
 		use no_std_net::{Ipv4Addr, Ipv6Addr, SocketAddr::*, SocketAddrV4, SocketAddrV6};
 
 		let local = match remote {
@@ -152,7 +141,14 @@ pub trait UdpStack {
 			V6(_) => V6(SocketAddrV6::new(Ipv6Addr::UNSPECIFIED, 0, 0, 0)),
 		};
 		self.connect_from(local, remote).await
-	}
+    }
+
+	/// Create a socket that has a fixed remote address.
+	///
+	/// The local address is given explicitly, but may be partially unspecified; it is fixed by the
+	/// network stack at connection time. The full local address is returned along with the
+	/// connected socket, primarily for debugging purposes.
+	async fn connect_from(&self, local: SocketAddr, remote: SocketAddr) -> Result<(SocketAddr, Self::Connected), Self::Error>;
 
 	/// Create a socket that has a fixed local address.
 	///
