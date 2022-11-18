@@ -2,6 +2,7 @@
 
 #![no_std]
 #![feature(generic_associated_types)]
+#![feature(async_fn_in_trait)]
 #![deny(missing_docs)]
 #![deny(unsafe_code)]
 
