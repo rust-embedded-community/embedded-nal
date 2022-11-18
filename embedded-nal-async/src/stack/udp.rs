@@ -31,7 +31,7 @@ pub trait ConnectedUdp {
 	type Error: embedded_io::Error;
 
 	/// Send the provided data to the connected peer
-	async fn send<'a>(&mut self, data: &[u8]) -> Result<(), Self::Error>;
+	async fn send(&mut self, data: &[u8]) -> Result<(), Self::Error>;
 
 	/// Receive a datagram into the provided buffer.
 	///
