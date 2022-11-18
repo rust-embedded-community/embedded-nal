@@ -14,7 +14,6 @@
 //!   Implementing `UniquelyBound` and `MultiplyBound` with the same type is expected to be a
 //!   common choice.
 
-use core::future::Future;
 use no_std_net::SocketAddr;
 
 /// This trait is implemented by UDP sockets.
@@ -32,11 +31,7 @@ pub trait ConnectedUdp {
 	type Error: embedded_io::Error;
 
 	/// Send the provided data to the connected peer
-	fn send<'a>(&'a mut self, data: &'a [u8]) -> Self::SendFuture<'a>;
-	/// Return type of the [`.send()`] method
-	type SendFuture<'a>: Future<Output = Result<(), Self::Error>>
-	where
-		Self: 'a;
+	async fn send<'a>(&mut self, data: &[u8]) -> Result<(), Self::Error>;
 
 	/// Receive a datagram into the provided buffer.
 	///
@@ -49,11 +44,7 @@ pub trait ConnectedUdp {
 	/// This deviates from the sync/nb equivalent trait in that it describes the overflow behavior
 	/// (a possibility not considered there). The name deviates from the original `receive()` to
 	/// make room for a version that is more zero-copy friendly.
-	fn receive_into<'a>(&'a mut self, buffer: &'a mut [u8]) -> Self::ReceiveIntoFuture<'a>;
-	/// Return type of the [`.receive_into()`] method
-	type ReceiveIntoFuture<'a>: Future<Output = Result<usize, Self::Error>>
-	where
-		Self: 'a;
+	async fn receive_into(&mut self, buffer: &mut [u8]) -> Result<usize, Self::Error>;
 
 	// WIP to allow zero-copy operation
 	// The plain receive is simple and can be provided -- implementations that don't populate
@@ -61,8 +52,8 @@ pub trait ConnectedUdp {
 	// on the socket still being exclusively owned. receive_oned is harder as providing it requires
 	// alloc.
 	//
-	// fn receive(&mut self, buffer: &mut [u8]) -> impl Future<Output = Result<impl AsRef<u8> + '_, Self::Error>>;
-	// fn receive_owned(&mut self) -> impl Future<Output = Result<impl AsRef<u8> + 'static, Self::Error>>;
+	// async fn receive(&mut self, buffer: &mut [u8]) -> utput = Result<impl AsRef<u8> + '_, Self::Error>;
+	// async fn receive_owned(&mut self) -> Result<impl AsRef<u8> + 'static, Self::Error>;
 }
 
 /// This trait is implemented by UDP sockets.
@@ -101,16 +92,12 @@ pub trait UnconnectedUdp {
 	/// receive time; these should be equal. This allows implementations of the trait to use a
 	/// single kind of socket for both sockets bound to a single and sockets bound to multiple
 	/// addresses.
-	fn send<'a>(
-		&'a mut self,
+	async fn send(
+		&mut self,
 		local: SocketAddr,
 		remote: SocketAddr,
-		data: &'a [u8],
-	) -> Self::SendFuture<'a>;
-	/// Return type of the [`.send()`] method
-	type SendFuture<'a>: Future<Output = Result<(), Self::Error>>
-	where
-		Self: 'a;
+		data: &[u8],
+	) -> Result<(), Self::Error>;
 
 	/// Receive a datagram into the provided buffer.
 	///
@@ -120,12 +107,7 @@ pub trait UnconnectedUdp {
 	///
 	/// The local and remote address are given, in that order, in the result along with the number
 	/// of bytes.
-	fn receive_into<'a>(&'a mut self, buffer: &'a mut [u8]) -> Self::ReceiveIntoFuture<'a>;
-	/// Return type of the [`.receive_into()`] method
-	type ReceiveIntoFuture<'a>: Future<
-		Output = Result<(usize, SocketAddr, SocketAddr), Self::Error>,
-	> where
-		Self: 'a;
+	async fn receive_into(& mut self, buffer: & mut [u8]) -> Result<(usize, SocketAddr, SocketAddr), Self::Error>;
 }
 
 /// This trait is implemented by UDP/IP stacks. The trait allows the underlying driver to
@@ -138,17 +120,11 @@ pub trait UdpStack {
 	type Error: embedded_io::Error;
 
 	/// Eventual socket return type of the [`.connect()`] method
-	type Connected<'m>: ConnectedUdp
-	where
-		Self: 'm;
+	type Connected: ConnectedUdp;
 	/// Eventual socket return type of the [`.bind_single()`] method
-	type UniquelyBound<'m>: UnconnectedUdp
-	where
-		Self: 'm;
+	type UniquelyBound: UnconnectedUdp;
 	/// Eventual return type of the [`.bind_multiple()`] method
-	type MultiplyBound<'m>: UnconnectedUdp
-	where
-		Self: 'm;
+	type MultiplyBound: UnconnectedUdp;
 
 	/// Create a socket that has a fixed remote address.
 	///
@@ -157,34 +133,25 @@ pub trait UdpStack {
 	/// While asynchronous traits implemented through GAT can not have provided default methods,
 	/// implementers are encouraged to use the hidden `.connect_default()` method if all they would
 	/// do is delegating to [`.connect_from`] with a suitable unspecified local address.
-	fn connect(&self, remote: SocketAddr) -> Self::ConnectFuture<'_>;
-	/// Future return type of the [`.connect()`] method
-	type ConnectFuture<'a>: Future<Output = Result<(SocketAddr, Self::Connected<'a>), Self::Error>>
-	where
-		Self: 'a;
+	async fn connect(&self, remote: SocketAddr) -> Result<(SocketAddr, Self::Connected), Self::Error>;
 
 	/// Create a socket that has a fixed remote address.
 	///
 	/// The local address is given explicitly, but may be partially unspecified; it is fixed by the
 	/// network stack at connection time. The full local address is returned along with the
 	/// connected socket, primarily for debugging purposes.
-	fn connect_from(&self, local: SocketAddr, remote: SocketAddr) -> Self::ConnectFromFuture<'_>;
-	/// Future return type of the [`.connect_from()`] method
-	type ConnectFromFuture<'a>: Future<
-		Output = Result<(SocketAddr, Self::Connected<'a>), Self::Error>,
-	> where
-		Self: 'a;
+	async fn connect_from(&self, local: SocketAddr, remote: SocketAddr) -> Result<(SocketAddr, Self::Connected), Self::Error>;
 
 	/// Helper that implements [`connect()`] using [`connect_from()`].
 	#[doc(hidden)]
-	fn connect_default(&self, remote: SocketAddr) -> Self::ConnectFromFuture<'_> {
+	async fn connect_default(&self, remote: SocketAddr) -> Result<(SocketAddr, Self::Connected), Self::Error> {
 		use no_std_net::{Ipv4Addr, Ipv6Addr, SocketAddr::*, SocketAddrV4, SocketAddrV6};
 
 		let local = match remote {
 			V4(_) => V4(SocketAddrV4::new(Ipv4Addr::UNSPECIFIED, 0)),
 			V6(_) => V6(SocketAddrV6::new(Ipv6Addr::UNSPECIFIED, 0, 0, 0)),
 		};
-		self.connect_from(local, remote)
+		self.connect_from(local, remote).await
 	}
 
 	/// Create a socket that has a fixed local address.
@@ -195,12 +162,7 @@ pub trait UdpStack {
 	///
 	/// The full local address is returned along with the bound socket; it may then be passed on to
 	/// other protocols for advertising purposes.
-	fn bind_single(&self, local: SocketAddr) -> Self::BindSingleFuture<'_>;
-	/// Future return type of the [`.bind_single()`] method
-	type BindSingleFuture<'a>: Future<
-		Output = Result<(SocketAddr, Self::UniquelyBound<'a>), Self::Error>,
-	> where
-		Self: 'a;
+	async fn bind_single(&self, local: SocketAddr) -> Result<(SocketAddr, Self::UniquelyBound), Self::Error>;
 
 	/// Create a socket that has no single fixed local address.
 	///
@@ -224,9 +186,6 @@ pub trait UdpStack {
 	/// * There is currently no hybrid binding that allows emulating what POSIX systems do when
 	///   binding to `[::]:0`, that is, picking some available port but then still leaving the
 	///   interface and IP address unspecified.
-	fn bind_multiple(&self, local: SocketAddr) -> Self::BindMultipleFuture<'_>;
-	/// Future return type of the [`.bind_multiple()`] method
-	type BindMultipleFuture<'a>: Future<Output = Result<Self::MultiplyBound<'a>, Self::Error>>
-	where
-		Self: 'a;
+	async fn bind_multiple(&self, local: SocketAddr) -> Result<Self::MultiplyBound, Self::Error>;
+
 }
