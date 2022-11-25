@@ -1,7 +1,8 @@
 //! # embedded-nal-async - An async Network Abstraction Layer for Embedded Systems
 
 #![no_std]
-#![feature(generic_associated_types)]
+#![feature(async_fn_in_trait, impl_trait_projections)]
+#![allow(incomplete_features)]
 #![deny(missing_docs)]
 #![deny(unsafe_code)]
 
