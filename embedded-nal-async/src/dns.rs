@@ -18,7 +18,7 @@ pub trait Dns {
 
 	/// Resolve the first ip address of a host, given its hostname and a desired
 	/// address record type to look for
-	async fn get_host_by_name<'m>(
+	async fn get_host_by_name(
 		&self,
 		host: &str,
 		addr_type: AddrType,
