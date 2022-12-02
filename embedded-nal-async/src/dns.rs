@@ -1,4 +1,3 @@
-use core::future::Future;
 use embedded_nal::AddrType;
 use heapless::String;
 use no_std_net::IpAddr;
@@ -17,23 +16,13 @@ pub trait Dns {
 	/// The type returned when we have an error
 	type Error: core::fmt::Debug;
 
-	/// Future for get_host_by_name
-	type GetHostByNameFuture<'m>: Future<Output = Result<IpAddr, Self::Error>>
-	where
-		Self: 'm;
-
 	/// Resolve the first ip address of a host, given its hostname and a desired
 	/// address record type to look for
-	fn get_host_by_name<'m>(
-		&'m self,
-		host: &'m str,
+	async fn get_host_by_name(
+		&self,
+		host: &str,
 		addr_type: AddrType,
-	) -> Self::GetHostByNameFuture<'m>;
-
-	/// Future for get_host_by_address
-	type GetHostByAddressFuture<'m>: Future<Output = Result<String<256>, Self::Error>>
-	where
-		Self: 'm;
+	) -> Result<IpAddr, Self::Error>;
 
 	/// Resolve the hostname of a host, given its ip address
 	///
@@ -41,5 +30,5 @@ pub trait Dns {
 	/// 255 bytes [`rfc1035`]
 	///
 	/// [`rfc1035`]: https://tools.ietf.org/html/rfc1035
-	fn get_host_by_address<'m>(&'m self, addr: IpAddr) -> Self::GetHostByAddressFuture<'m>;
+	async fn get_host_by_address(&self, addr: IpAddr) -> Result<String<256>, Self::Error>;
 }

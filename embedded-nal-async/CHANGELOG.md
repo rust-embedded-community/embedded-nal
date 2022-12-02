@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.3.0] - 2022-11-25
+
+- Bump `embedded-io` dependency to `0.4`
+- Switch all traits to use [`async_fn_in_trait`](https://blog.rust-lang.org/inside-rust/2022/11/17/async-fn-in-trait-nightly.html) (AFIT). Requires `nightly-2022-11-22` or newer.
+
 ## [0.2.0] - 2022-08-03
 
 TcpClient trait for creating shared async TCP/IP stack implementations.
