@@ -107,7 +107,10 @@ pub trait UnconnectedUdp {
 	///
 	/// The local and remote address are given, in that order, in the result along with the number
 	/// of bytes.
-	async fn receive_into(& mut self, buffer: & mut [u8]) -> Result<(usize, SocketAddr, SocketAddr), Self::Error>;
+	async fn receive_into(
+		&mut self,
+		buffer: &mut [u8],
+	) -> Result<(usize, SocketAddr, SocketAddr), Self::Error>;
 }
 
 /// This trait is implemented by UDP/IP stacks. The trait allows the underlying driver to
@@ -130,10 +133,13 @@ pub trait UdpStack {
 	///
 	/// The local address is chosen automatically.
 	///
-    /// There is a provided implementation that implements this from the maximally unspecified
-    /// local address and [`.connect_from()`], but may be provided more efficiently by
-    /// implementers.
-	async fn connect(&self, remote: SocketAddr) -> Result<(SocketAddr, Self::Connected), Self::Error> {
+	/// There is a provided implementation that implements this from the maximally unspecified
+	/// local address and [`.connect_from()`], but may be provided more efficiently by
+	/// implementers.
+	async fn connect(
+		&self,
+		remote: SocketAddr,
+	) -> Result<(SocketAddr, Self::Connected), Self::Error> {
 		use no_std_net::{Ipv4Addr, Ipv6Addr, SocketAddr::*, SocketAddrV4, SocketAddrV6};
 
 		let local = match remote {
@@ -141,14 +147,18 @@ pub trait UdpStack {
 			V6(_) => V6(SocketAddrV6::new(Ipv6Addr::UNSPECIFIED, 0, 0, 0)),
 		};
 		self.connect_from(local, remote).await
-    }
+	}
 
 	/// Create a socket that has a fixed remote address.
 	///
 	/// The local address is given explicitly, but may be partially unspecified; it is fixed by the
 	/// network stack at connection time. The full local address is returned along with the
 	/// connected socket, primarily for debugging purposes.
-	async fn connect_from(&self, local: SocketAddr, remote: SocketAddr) -> Result<(SocketAddr, Self::Connected), Self::Error>;
+	async fn connect_from(
+		&self,
+		local: SocketAddr,
+		remote: SocketAddr,
+	) -> Result<(SocketAddr, Self::Connected), Self::Error>;
 
 	/// Create a socket that has a fixed local address.
 	///
@@ -158,7 +168,10 @@ pub trait UdpStack {
 	///
 	/// The full local address is returned along with the bound socket; it may then be passed on to
 	/// other protocols for advertising purposes.
-	async fn bind_single(&self, local: SocketAddr) -> Result<(SocketAddr, Self::UniquelyBound), Self::Error>;
+	async fn bind_single(
+		&self,
+		local: SocketAddr,
+	) -> Result<(SocketAddr, Self::UniquelyBound), Self::Error>;
 
 	/// Create a socket that has no single fixed local address.
 	///
@@ -183,5 +196,4 @@ pub trait UdpStack {
 	///   binding to `[::]:0`, that is, picking some available port but then still leaving the
 	///   interface and IP address unspecified.
 	async fn bind_multiple(&self, local: SocketAddr) -> Result<Self::MultiplyBound, Self::Error>;
-
 }
