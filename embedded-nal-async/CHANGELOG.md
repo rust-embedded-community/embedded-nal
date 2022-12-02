@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+- Add traits for UDP
+
 ## [0.3.0] - 2022-11-25
 
 - Bump `embedded-io` dependency to `0.4`
