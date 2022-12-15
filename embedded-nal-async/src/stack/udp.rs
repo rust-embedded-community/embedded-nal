@@ -123,11 +123,11 @@ pub trait UdpStack {
 	type Error: embedded_io::Error;
 
 	/// Eventual socket return type of the [`.connect()`] method
-	type Connected: ConnectedUdp;
+	type Connected: ConnectedUdp<Error = Self::Error>;
 	/// Eventual socket return type of the [`.bind_single()`] method
-	type UniquelyBound: UnconnectedUdp;
+	type UniquelyBound: UnconnectedUdp<Error = Self::Error>;
 	/// Eventual return type of the [`.bind_multiple()`] method
-	type MultiplyBound: UnconnectedUdp;
+	type MultiplyBound: UnconnectedUdp<Error = Self::Error>;
 
 	/// Create a socket that has a fixed remote address.
 	///
