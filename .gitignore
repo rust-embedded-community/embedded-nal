@@ -1,3 +1,4 @@
 /target
+/embedded-nal-async/target
 **/*.rs.bk
 Cargo.lock
