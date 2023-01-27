@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.4.0] - 2023-01-27
+
 - Add traits for UDP
 
 ## [0.3.0] - 2022-11-25
