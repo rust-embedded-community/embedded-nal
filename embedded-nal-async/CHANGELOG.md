@@ -25,5 +25,6 @@ Remove TcpClientStack, TcpFullStack and UDP traits pending traits that support s
 
 Initial release to crates.io.
 
-[Unreleased]: https://github.com/rust-embedded-community/embedded-nal/compare/embedded-nal-async-v0.1.0...HEAD
+[Unreleased]: https://github.com/rust-embedded-community/embedded-nal/compare/embedded-nal-async-v0.4.0...HEAD
+[0.4.0]: https://github.com/rust-embedded-community/embedded-nal/compare/embedded-nal-async-v0.3.0...embedded-nal-async-v0.4.0
 [0.1.0]: https://github.com/rust-embedded-community/embedded-nal/releases/tag/embedded-nal-async-v0.1.0
