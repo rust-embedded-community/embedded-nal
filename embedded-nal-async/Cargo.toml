@@ -11,6 +11,9 @@ readme = "README.md"
 keywords = ["network"]
 categories = ["embedded", "hardware-support", "no-std", "network-programming", "asynchronous"]
 
+[features]
+ip_in_core = []
+
 [dependencies]
 no-std-net = "0.6"
 heapless = "^0.7"

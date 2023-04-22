@@ -1,4 +1,4 @@
-use no_std_net::SocketAddr;
+use crate::SocketAddr;
 
 /// This trait is implemented by TCP/IP stacks. The trait allows the underlying driver to
 /// construct multiple connections that implement the I/O traits from embedded-io.

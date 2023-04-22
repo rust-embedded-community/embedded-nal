@@ -14,7 +14,7 @@
 //!   Implementing `UniquelyBound` and `MultiplyBound` with the same type is expected to be a
 //!   common choice.
 
-use no_std_net::SocketAddr;
+use crate::SocketAddr;
 
 /// This trait is implemented by UDP sockets.
 ///
@@ -140,7 +140,7 @@ pub trait UdpStack {
 		&self,
 		remote: SocketAddr,
 	) -> Result<(SocketAddr, Self::Connected), Self::Error> {
-		use no_std_net::{Ipv4Addr, Ipv6Addr, SocketAddr::*, SocketAddrV4, SocketAddrV6};
+		use crate::{Ipv4Addr, Ipv6Addr, SocketAddr::*, SocketAddrV4, SocketAddrV6};
 
 		let local = match remote {
 			V4(_) => V4(SocketAddrV4::new(Ipv4Addr::UNSPECIFIED, 0)),
