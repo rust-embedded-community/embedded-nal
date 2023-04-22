@@ -1,6 +1,6 @@
+use crate::IpAddr;
 use embedded_nal::AddrType;
 use heapless::String;
-use no_std_net::IpAddr;
 
 /// This trait is an extension trait for [`TcpStack`] and [`UdpStack`] for dns
 /// resolutions. It does not handle every DNS record type, but is meant as an

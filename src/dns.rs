@@ -1,5 +1,5 @@
+use crate::IpAddr;
 use heapless::String;
-use no_std_net::IpAddr;
 
 /// This is the host address type to be returned by `gethostbyname`.
 ///

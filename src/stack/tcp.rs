@@ -1,4 +1,4 @@
-use no_std_net::SocketAddr;
+use crate::SocketAddr;
 
 /// This trait is implemented by TCP/IP stacks. You could, for example, have an implementation
 /// which knows how to send AT commands to an ESP8266 WiFi module. You could have another implementation
