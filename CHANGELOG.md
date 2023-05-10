@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Bump dependency version of `no-std-net` to `v0.6`.
 - Bump MSRV to 1.53.0 due to `no-std-net`'s use of or-patterns.
 - Added support for `core::net` with the `ip_in_core` feature.
+- [breaking] New APIs added to `TcpClientStack` to support more robust understanding of the TCP
+socket state
+    * New APIs include `is_open()`, `may_send()`, and `may_recv()`
 
 ## [0.6.0] - 2021-05-25
 
