@@ -111,8 +111,16 @@ impl<T: TcpClientStack> TcpClientStack for &mut T {
 		T::connect(self, socket, remote)
 	}
 
-	fn is_connected(&mut self, socket: &Self::TcpSocket) -> Result<bool, Self::Error> {
-		T::is_connected(self, socket)
+	fn is_open(&mut self, socket: &Self::TcpSocket) -> Result<bool, Self::Error> {
+		T::is_open(self, socket)
+	}
+
+	fn may_send(&mut self, socket: &Self::TcpSocket) -> Result<bool, Self::Error> {
+		T::may_send(self, socket)
+	}
+
+	fn may_receive(&mut self, socket: &Self::TcpSocket) -> Result<bool, Self::Error> {
+		T::may_receive(self, socket)
 	}
 
 	fn send(
