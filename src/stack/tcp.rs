@@ -28,20 +28,20 @@ pub trait TcpClientStack {
 	) -> nb::Result<(), Self::Error>;
 
 	/// Determine if a socket is opened.
-    ///
-    /// Returns `Ok(true)` if the TCP socket is actively ingressing and egressing packets. This
-    /// corresponds to any TCP state that is not `CLOSED` or `TIME-WAIT`.
+	///
+	/// Returns `Ok(true)` if the TCP socket is actively ingressing and egressing packets. This
+	/// corresponds to any TCP state that is not `CLOSED` or `TIME-WAIT`.
 	fn is_open(&mut self, socket: &Self::TcpSocket) -> Result<bool, Self::Error>;
 
-    /// Check if the TCP socket can transmit data.
-    ///
-    /// Returns `Ok(true)` if the TCP transmit half is open and connected.
-    fn may_send(&mut self, socket: &Self::TcpSocket) -> Result<bool, Self::Error>;
+	/// Check if the TCP socket can transmit data.
+	///
+	/// Returns `Ok(true)` if the TCP transmit half is open and connected.
+	fn may_send(&mut self, socket: &Self::TcpSocket) -> Result<bool, Self::Error>;
 
-    /// Check if the TCP socket can receive data.
-    ///
-    /// Returns `Ok(true)` if the TCP receive half is open and connected.
-    fn may_receive(&mut self, socket: &Self::TcpSocket) -> Result<bool, Self::Error>;
+	/// Check if the TCP socket can receive data.
+	///
+	/// Returns `Ok(true)` if the TCP receive half is open and connected.
+	fn may_receive(&mut self, socket: &Self::TcpSocket) -> Result<bool, Self::Error>;
 
 	/// Write to the stream.
 	///
