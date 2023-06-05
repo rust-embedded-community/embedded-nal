@@ -32,3 +32,19 @@ pub trait Dns {
 	/// [`rfc1035`]: https://tools.ietf.org/html/rfc1035
 	async fn get_host_by_address(&self, addr: IpAddr) -> Result<String<256>, Self::Error>;
 }
+
+impl<T: Dns> Dns for &T {
+	type Error = T::Error;
+
+	async fn get_host_by_name(
+		&self,
+		host: &str,
+		addr_type: AddrType,
+	) -> Result<IpAddr, Self::Error> {
+		T::get_host_by_name(self, host, addr_type).await
+	}
+
+	async fn get_host_by_address(&self, addr: IpAddr) -> Result<String<256>, Self::Error> {
+		T::get_host_by_address(self, addr).await
+	}
+}
