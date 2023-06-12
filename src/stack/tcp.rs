@@ -1,5 +1,22 @@
 use crate::SocketAddr;
 
+/// Represents specific errors encountered during TCP operations.
+#[non_exhaustive]
+#[derive(Copy, Clone, PartialEq, Debug)]
+pub enum TcpErrorKind {
+	/// The peer has closed one or both directions and the connection is broken.
+	PipeClosed,
+
+	/// Some other error has occurred.
+	Other,
+}
+
+/// Methods to resolve errors into identifiable, actionable codes on the client side.
+pub trait TcpError: core::fmt::Debug {
+	/// Determines the kind of error that occurred.
+	fn kind(&self) -> TcpErrorKind;
+}
+
 /// This trait is implemented by TCP/IP stacks. You could, for example, have an implementation
 /// which knows how to send AT commands to an ESP8266 WiFi module. You could have another implementation
 /// which knows how to driver the Rust Standard Library's `std::net` module. Given this trait, you can
@@ -8,7 +25,7 @@ pub trait TcpClientStack {
 	/// The type returned when we create a new TCP socket
 	type TcpSocket;
 	/// The type returned when we have an error
-	type Error: core::fmt::Debug;
+	type Error: TcpError;
 
 	/// Open a socket for usage as a TCP client.
 	///
@@ -26,22 +43,6 @@ pub trait TcpClientStack {
 		socket: &mut Self::TcpSocket,
 		remote: SocketAddr,
 	) -> nb::Result<(), Self::Error>;
-
-	/// Determine if a socket is opened.
-	///
-	/// Returns `Ok(true)` if the TCP socket is actively ingressing and egressing packets. This
-	/// corresponds to any TCP state that is not `CLOSED` or `TIME-WAIT`.
-	fn is_open(&mut self, socket: &Self::TcpSocket) -> Result<bool, Self::Error>;
-
-	/// Check if the TCP socket can transmit data.
-	///
-	/// Returns `Ok(true)` if the TCP transmit half is open and connected.
-	fn may_send(&mut self, socket: &Self::TcpSocket) -> Result<bool, Self::Error>;
-
-	/// Check if the TCP socket can receive data.
-	///
-	/// Returns `Ok(true)` if the TCP receive half is open and connected.
-	fn may_receive(&mut self, socket: &Self::TcpSocket) -> Result<bool, Self::Error>;
 
 	/// Write to the stream.
 	///
@@ -109,18 +110,6 @@ impl<T: TcpClientStack> TcpClientStack for &mut T {
 		remote: SocketAddr,
 	) -> nb::Result<(), Self::Error> {
 		T::connect(self, socket, remote)
-	}
-
-	fn is_open(&mut self, socket: &Self::TcpSocket) -> Result<bool, Self::Error> {
-		T::is_open(self, socket)
-	}
-
-	fn may_send(&mut self, socket: &Self::TcpSocket) -> Result<bool, Self::Error> {
-		T::may_send(self, socket)
-	}
-
-	fn may_receive(&mut self, socket: &Self::TcpSocket) -> Result<bool, Self::Error> {
-		T::may_receive(self, socket)
 	}
 
 	fn send(

@@ -128,9 +128,6 @@ where
 	forward! {connect(socket: &mut Self::TcpSocket, address: SocketAddr) -> Result<(), nb::Error<<T as TcpClientStack>::Error>>}
 	forward! {send(socket: &mut Self::TcpSocket, data: &[u8]) -> Result<usize, nb::Error<<T as TcpClientStack>::Error>>}
 	forward! {receive(socket: &mut Self::TcpSocket, data: &mut [u8]) -> Result<usize, nb::Error<<T as TcpClientStack>::Error>>}
-	forward! {is_open(socket: &Self::TcpSocket) -> Result<bool, Self::Error>}
-	forward! {may_send(socket: &Self::TcpSocket) -> Result<bool, Self::Error>}
-	forward! {may_receive(socket: &Self::TcpSocket) -> Result<bool, Self::Error>}
 	forward! {close(socket: Self::TcpSocket) -> Result<(), Self::Error>}
 }
 
