@@ -4,7 +4,7 @@ use crate::SocketAddr;
 #[non_exhaustive]
 #[derive(Copy, Clone, PartialEq, Debug)]
 pub enum TcpErrorKind {
-	/// The peer has closed one or both directions and the connection is broken.
+	/// The socket has been closed in the direction in which the failing operation was attempted.
 	PipeClosed,
 
 	/// Some other error has occurred.
