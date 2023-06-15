@@ -1,5 +1,22 @@
 use crate::SocketAddr;
 
+/// Represents specific errors encountered during TCP operations.
+#[non_exhaustive]
+#[derive(Copy, Clone, PartialEq, Debug)]
+pub enum TcpErrorKind {
+	/// The socket has been closed in the direction in which the failing operation was attempted.
+	PipeClosed,
+
+	/// Some other error has occurred.
+	Other,
+}
+
+/// Methods to resolve errors into identifiable, actionable codes on the client side.
+pub trait TcpError: core::fmt::Debug {
+	/// Determines the kind of error that occurred.
+	fn kind(&self) -> TcpErrorKind;
+}
+
 /// This trait is implemented by TCP/IP stacks. You could, for example, have an implementation
 /// which knows how to send AT commands to an ESP8266 WiFi module. You could have another implementation
 /// which knows how to driver the Rust Standard Library's `std::net` module. Given this trait, you can
@@ -8,7 +25,7 @@ pub trait TcpClientStack {
 	/// The type returned when we create a new TCP socket
 	type TcpSocket;
 	/// The type returned when we have an error
-	type Error: core::fmt::Debug;
+	type Error: TcpError;
 
 	/// Open a socket for usage as a TCP client.
 	///
@@ -26,9 +43,6 @@ pub trait TcpClientStack {
 		socket: &mut Self::TcpSocket,
 		remote: SocketAddr,
 	) -> nb::Result<(), Self::Error>;
-
-	/// Check if this socket is connected
-	fn is_connected(&mut self, socket: &Self::TcpSocket) -> Result<bool, Self::Error>;
 
 	/// Write to the stream.
 	///
@@ -96,10 +110,6 @@ impl<T: TcpClientStack> TcpClientStack for &mut T {
 		remote: SocketAddr,
 	) -> nb::Result<(), Self::Error> {
 		T::connect(self, socket, remote)
-	}
-
-	fn is_connected(&mut self, socket: &Self::TcpSocket) -> Result<bool, Self::Error> {
-		T::is_connected(self, socket)
 	}
 
 	fn send(

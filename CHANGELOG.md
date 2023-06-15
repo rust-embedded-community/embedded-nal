@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Bump dependency version of `no-std-net` to `v0.6`.
 - Bump MSRV to 1.53.0 due to `no-std-net`'s use of or-patterns.
 - Added support for `core::net` with the `ip_in_core` feature.
+- [breaking] New TCP error enumerations added for identifying TCP-related connection errors
+- [breaking] Removed the `TcpClientStack::is_connected` API
 
 ## [0.6.0] - 2021-05-25
 
