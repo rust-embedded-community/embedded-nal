@@ -17,5 +17,5 @@ ip_in_core = []
 [dependencies]
 no-std-net = "0.6"
 heapless = "^0.7"
-embedded-nal = { version = "0.6.0", path = "../" }
+embedded-nal = { version = "0.7.0", path = "../" }
 embedded-io = { version = "0.4.0", default-features = false, features = ["async"] }
