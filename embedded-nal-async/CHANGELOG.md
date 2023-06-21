@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 - Let `&T` for `T: Dns` implement `Dns`
+- Bumped to `embedded-nal` 0.7
 
 ## [0.4.0] - 2023-01-27
 
