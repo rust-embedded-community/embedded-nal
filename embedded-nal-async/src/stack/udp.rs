@@ -28,7 +28,7 @@ use crate::SocketAddr;
 /// address at connect time.
 pub trait ConnectedUdp {
 	/// Error type returned by send and receive operations.
-	type Error: embedded_io::Error;
+	type Error: embedded_io_async::Error;
 
 	/// Send the provided data to the connected peer
 	async fn send(&mut self, data: &[u8]) -> Result<(), Self::Error>;
@@ -67,7 +67,7 @@ pub trait ConnectedUdp {
 /// applicable. The implementer MAY check them for compatibility, and SHOULD do that in debug mode.
 pub trait UnconnectedUdp {
 	/// Error type returned by send and receive operations.
-	type Error: embedded_io::Error;
+	type Error: embedded_io_async::Error;
 
 	/// Send the provided data to a peer
 	///
@@ -114,13 +114,13 @@ pub trait UnconnectedUdp {
 }
 
 /// This trait is implemented by UDP/IP stacks. The trait allows the underlying driver to
-/// construct multiple connections that implement the I/O traits from embedded-io.
+/// construct multiple connections that implement the I/O traits from embedded-io-async.
 ///
 /// Note that stacks with exotic connection creation methods may still not implement this, yet have
 /// objects that implement [`ConnectedUdp`] or similar.
 pub trait UdpStack {
 	/// Error type returned on socket creation failure.
-	type Error: embedded_io::Error;
+	type Error: embedded_io_async::Error;
 
 	/// Eventual socket return type of the [`.connect()`] method
 	type Connected: ConnectedUdp<Error = Self::Error>;

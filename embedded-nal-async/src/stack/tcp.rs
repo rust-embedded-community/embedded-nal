@@ -1,16 +1,16 @@
 use crate::SocketAddr;
 
 /// This trait is implemented by TCP/IP stacks. The trait allows the underlying driver to
-/// construct multiple connections that implement the I/O traits from embedded-io.
+/// construct multiple connections that implement the I/O traits from embedded-io-async.
 ///
 /// The associated connection type should close the connection when dropped.
 pub trait TcpConnect {
 	/// Error type returned on connect failure.
-	type Error: embedded_io::Error;
+	type Error: embedded_io_async::Error;
 
 	/// Type holding state of a TCP connection. Should close the connection when dropped.
-	type Connection<'a>: embedded_io::asynch::Read<Error = Self::Error>
-		+ embedded_io::asynch::Write<Error = Self::Error>
+	type Connection<'a>: embedded_io_async::Read<Error = Self::Error>
+		+ embedded_io_async::Write<Error = Self::Error>
 	where
 		Self: 'a;
 
