@@ -7,8 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+No unreleased changes yet.
+
+## [0.5.0] - 2023-08-07
+
 - Let `&T` for `T: Dns` implement `Dns`
 - Bumped to `embedded-nal` 0.7
+- Bumped to `embedded-io-async` 0.5
 
 ## [0.4.0] - 2023-01-27
 
@@ -28,6 +33,7 @@ Remove TcpClientStack, TcpFullStack and UDP traits pending traits that support s
 
 Initial release to crates.io.
 
-[Unreleased]: https://github.com/rust-embedded-community/embedded-nal/compare/embedded-nal-async-v0.4.0...HEAD
+[Unreleased]: https://github.com/rust-embedded-community/embedded-nal/compare/embedded-nal-async-v0.5.0...HEAD
+[0.5.0]: https://github.com/rust-embedded-community/embedded-nal/compare/embedded-nal-async-v0.4.0...embedded-nal-async-v0.5.0
 [0.4.0]: https://github.com/rust-embedded-community/embedded-nal/compare/embedded-nal-async-v0.3.0...embedded-nal-async-v0.4.0
 [0.1.0]: https://github.com/rust-embedded-community/embedded-nal/releases/tag/embedded-nal-async-v0.1.0
