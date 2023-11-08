@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Bump MSRV to 1.60.0 (required for Edition 2021)
 - Switch to Edition 2021
+- [breaking] `Dns::get_host_by_address` now uses `&mut [u8]` instead of `heapless::String`.
 
 ## [0.7.0] - 2023-06-21
 

@@ -9,9 +9,6 @@
 
 mod dns;
 mod stack;
-// Needed by embedded-nal trait implementers who build get_host_by_address results, or by trait
-// users who pass the results on.
-pub use heapless;
 
 #[cfg(feature = "ip_in_core")]
 pub use core::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, SocketAddrV6};

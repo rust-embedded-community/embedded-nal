@@ -1,5 +1,4 @@
 use crate::IpAddr;
-use heapless::String;
 
 /// This is the host address type to be returned by `gethostbyname`.
 ///
@@ -37,13 +36,18 @@ pub trait Dns {
 		addr_type: AddrType,
 	) -> nb::Result<IpAddr, Self::Error>;
 
-	/// Resolve the hostname of a host, given its ip address
+	/// Resolve the hostname of a host, given its ip address.
+	///
+	/// The hostname is stored at the beginning of `result`, the length is returned.
+	///
+	/// If the buffer is too small to hold the domain name, an error should be returned.
 	///
 	/// **Note**: A fully qualified domain name (FQDN), has a maximum length of
-	/// 255 bytes [`rfc1035`]
+	/// 255 bytes according to [`rfc1035`]. Therefore, you can pass a 255-byte long
+	/// buffer to guarantee it'll always be large enough.
 	///
 	/// [`rfc1035`]: https://tools.ietf.org/html/rfc1035
-	fn get_host_by_address(&mut self, addr: IpAddr) -> nb::Result<String<256>, Self::Error>;
+	fn get_host_by_address(&self, addr: IpAddr, result: &mut [u8]) -> Result<usize, Self::Error>;
 }
 
 impl<T: Dns> Dns for &mut T {
@@ -57,7 +61,7 @@ impl<T: Dns> Dns for &mut T {
 		T::get_host_by_name(self, hostname, addr_type)
 	}
 
-	fn get_host_by_address(&mut self, addr: IpAddr) -> nb::Result<String<256>, Self::Error> {
-		T::get_host_by_address(self, addr)
+	fn get_host_by_address(&self, addr: IpAddr, result: &mut [u8]) -> Result<usize, Self::Error> {
+		T::get_host_by_address(self, addr, result)
 	}
 }
