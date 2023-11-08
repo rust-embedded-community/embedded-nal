@@ -1,6 +1,6 @@
 on:
   push:
-    branches: [ staging, trying, master ]
+    branches: [staging, trying, master]
   pull_request:
 
 name: Code formatting check
@@ -23,7 +23,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: nightly-2022-11-22
+          toolchain: nightly-2023-11-01
           components: rustfmt
       - run: cargo fmt --all -- --check
         working-directory: embedded-nal-async

@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 - [breaking] `Dns::get_host_by_address` now uses `&mut [u8]` instead of `heapless::String`.
+- [breaking] Remove unneeded `where Self: 'a` bound in `TcpClient::connect`.
 
 ## [0.6.0] - 2023-10-03
 
