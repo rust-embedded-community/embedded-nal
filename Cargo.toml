@@ -7,7 +7,7 @@ authors = [
     "Diego Barrios Romero <eldruin@gmail.com>",
     "Ryan Summers <ryan.summers@vertigo-designs.com>",
 ]
-edition = "2018"
+edition = "2021"
 description = "A Network Abstraction Layer (NAL) for Embedded Systems"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/rust-embedded-community/embedded-nal"

@@ -1,6 +1,6 @@
 on:
   push:
-    branches: [ staging, trying, master ]
+    branches: [staging, trying, master]
   pull_request:
 
 name: Continuous integration
@@ -14,11 +14,12 @@ jobs:
         rust: [stable]
 
         # The default target we're compiling on and for
-        TARGET: [x86_64-unknown-linux-gnu, thumbv6m-none-eabi, thumbv7m-none-eabi]
+        TARGET:
+          [x86_64-unknown-linux-gnu, thumbv6m-none-eabi, thumbv7m-none-eabi]
 
         include:
           # Test MSRV
-          - rust: 1.53.0
+          - rust: 1.60.0
             TARGET: x86_64-unknown-linux-gnu
 
           # Test nightly but don't fail
@@ -42,7 +43,8 @@ jobs:
     strategy:
       matrix:
         rust: [nightly-2022-11-22]
-        TARGET: [x86_64-unknown-linux-gnu, thumbv6m-none-eabi, thumbv7m-none-eabi]
+        TARGET:
+          [x86_64-unknown-linux-gnu, thumbv6m-none-eabi, thumbv7m-none-eabi]
 
     steps:
       - uses: actions/checkout@v3

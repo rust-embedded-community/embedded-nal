@@ -35,7 +35,7 @@ These issues / PRs will be labeled as `proposal`s in the issue tracker.
 
 ## Minimum Supported Rust Version (MSRV)
 
-This crate is guaranteed to compile on stable Rust 1.53.0 and up. It *might*
+This crate is guaranteed to compile on stable Rust 1.60.0 and up. It _might_
 compile with older versions but that may change in any new patch release.
 
 ## License
