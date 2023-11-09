@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-No unreleased changes yet.
+- [breaking] `Dns::get_host_by_address` now uses `&mut [u8]` instead of `heapless::String`.
 
 ## [0.6.0] - 2023-10-03
 

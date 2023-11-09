@@ -24,4 +24,3 @@ ip_in_core = []
 [dependencies]
 nb = "1"
 no-std-net = { version = "0.6", optional = true }
-heapless = "^0.7"
