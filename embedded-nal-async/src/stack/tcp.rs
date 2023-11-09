@@ -17,10 +17,8 @@ pub trait TcpConnect {
 	/// Connect to the given remote host and port.
 	///
 	/// Returns `Ok` if the connection was successful.
-	async fn connect<'a>(&'a self, remote: SocketAddr) -> Result<Self::Connection<'a>, Self::Error>
-	// This bound is required due to an AFIT limitaton: https://github.com/rust-lang/rust/issues/104908
-	where
-		Self: 'a;
+	async fn connect<'a>(&'a self, remote: SocketAddr)
+		-> Result<Self::Connection<'a>, Self::Error>;
 }
 
 impl<T: TcpConnect> TcpConnect for &T {
@@ -28,10 +26,10 @@ impl<T: TcpConnect> TcpConnect for &T {
 
 	type Connection<'a> = T::Connection<'a> where Self: 'a;
 
-	async fn connect<'a>(&'a self, remote: SocketAddr) -> Result<Self::Connection<'a>, Self::Error>
-	where
-		Self: 'a,
-	{
+	async fn connect<'a>(
+		&'a self,
+		remote: SocketAddr,
+	) -> Result<Self::Connection<'a>, Self::Error> {
 		T::connect(self, remote).await
 	}
 }

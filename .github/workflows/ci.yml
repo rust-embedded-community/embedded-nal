@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        rust: [nightly-2022-11-22]
+        rust: [nightly-2023-11-01]
         TARGET:
           [x86_64-unknown-linux-gnu, thumbv6m-none-eabi, thumbv7m-none-eabi]
 
