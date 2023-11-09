@@ -7,9 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+- Bump MSRV to 1.60.0 (required for Edition 2021)
+- Switch to Edition 2021
+
 ## [0.7.0] - 2023-06-21
 
-* Add blanket impls of all the traits for mutable references.
+- Add blanket impls of all the traits for mutable references.
 - Bump dependency version of `no-std-net` to `v0.6`.
 - Bump MSRV to 1.53.0 due to `no-std-net`'s use of or-patterns.
 - Added support for `core::net` with the `ip_in_core` feature.
@@ -30,18 +33,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [0.4.0] - 2021-03-05
 
 ### Changed
+
 - Changed [`Dns`](./src/dns.rs) methods to return `nb::Result<..>` to allow non-blocking implementations.
 - Bump dependency version of `heapless` to `v0.6.1` to address security issue of sub-dependency.
 - Bump dependency version of `no-std-net` to `v0.5`.
 - Bump MSRV to 1.46.0 to get `const-fn` for `no-std-net`.
 
-
 ## [0.3.0] - 2021-02-15
 
 ### Added
+
 - New optional struct [`SharedNal`](./src/stack/share.rs) that can share a single underlying implementation among several users within a thread.
 
 ### Changed
+
 - Changed the names of `UdpClient`/`TcpClient` to `UdpClientStack`/`TcpClientStack`
 - Changed the names of `UdpServer`/`TcpServer` to `UdpFullStack`/`TcpFullStack`
 - Changed the method names `Dns::gethostbyname`/`Dns::gethostbyaddr` to `Dns::get_host_by_name`/`Dns::get_host_by_address`
@@ -50,10 +55,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [0.2.0] - 2020-12-02
 
 ### Added
+
 - Added a new `UdpServer` trait with server-specific methods
 - Added a new `TcpServer` trait with server-specific methods
 
 ### Changed
+
 - Changed the `UdpStack::receive` method to return the packet sender address, along with the packet length
 - Changed the name of `UdpStack` to `UdpClient`
 - Changed name of `TcpStack` to `TcpClient`
@@ -63,6 +70,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Updated `UdpStack::connect()` to modify an existing socket
 
 ### Removed
+
 - Removed `Mode` enum, implementations should instead use `nb::WouldBlock`
 
 ## [0.1.0] - 2020-08-26
