@@ -1,6 +1,6 @@
 [package]
 name = "embedded-nal-async"
-version = "0.7.0"
+version = "0.7.1"
 edition = "2021"
 description = "An Async Network Abstraction Layer (NAL) for Embedded Systems"
 license = "MIT OR Apache-2.0"
