@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 No unreleased changes yet.
 
+## [0.7.1] - 2023-11-28
+
+- Use `feature()` on nightly toolchains only. This adds support for 1.75 beta and stable.
+
 ## [0.7.0] - 2023-11-10
 
 - [breaking] `Dns::get_host_by_address` now uses `&mut [u8]` instead of `heapless::String`.
@@ -43,7 +47,8 @@ Remove TcpClientStack, TcpFullStack and UDP traits pending traits that support s
 
 Initial release to crates.io.
 
-[Unreleased]: https://github.com/rust-embedded-community/embedded-nal/compare/embedded-nal-async-v0.7.0...HEAD
+[Unreleased]: https://github.com/rust-embedded-community/embedded-nal/compare/embedded-nal-async-v0.7.1...HEAD
+[0.7.1]: https://github.com/rust-embedded-community/embedded-nal/compare/embedded-nal-async-v0.7.0...embedded-nal-async-v0.7.1
 [0.7.0]: https://github.com/rust-embedded-community/embedded-nal/compare/embedded-nal-async-v0.6.0...embedded-nal-async-v0.7.0
 [0.6.0]: https://github.com/rust-embedded-community/embedded-nal/compare/embedded-nal-async-v0.5.0...embedded-nal-async-v0.6.0
 [0.5.0]: https://github.com/rust-embedded-community/embedded-nal/compare/embedded-nal-async-v0.4.0...embedded-nal-async-v0.5.0
