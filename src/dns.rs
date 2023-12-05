@@ -47,7 +47,7 @@ pub trait Dns {
 	/// buffer to guarantee it'll always be large enough.
 	///
 	/// [`rfc1035`]: https://tools.ietf.org/html/rfc1035
-	fn get_host_by_address(&self, addr: IpAddr, result: &mut [u8]) -> Result<usize, Self::Error>;
+	fn get_host_by_address(&mut self, addr: IpAddr, result: &mut [u8]) -> Result<usize, Self::Error>;
 }
 
 impl<T: Dns> Dns for &mut T {
@@ -61,7 +61,7 @@ impl<T: Dns> Dns for &mut T {
 		T::get_host_by_name(self, hostname, addr_type)
 	}
 
-	fn get_host_by_address(&self, addr: IpAddr, result: &mut [u8]) -> Result<usize, Self::Error> {
+	fn get_host_by_address(&mut self, addr: IpAddr, result: &mut [u8]) -> Result<usize, Self::Error> {
 		T::get_host_by_address(self, addr, result)
 	}
 }
