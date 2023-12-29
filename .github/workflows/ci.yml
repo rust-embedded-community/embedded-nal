@@ -19,7 +19,7 @@ jobs:
 
         include:
           # Test MSRV
-          - rust: 1.60.0
+          - rust: 1.77.0
             TARGET: x86_64-unknown-linux-gnu
 
           # Test nightly but don't fail
@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        rust: [nightly-2023-11-01]
+        rust: [stable]
         TARGET:
           [x86_64-unknown-linux-gnu, thumbv6m-none-eabi, thumbv7m-none-eabi]
 

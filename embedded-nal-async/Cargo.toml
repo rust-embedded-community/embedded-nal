@@ -11,10 +11,6 @@ readme = "README.md"
 keywords = ["network"]
 categories = ["embedded", "hardware-support", "no-std", "network-programming", "asynchronous"]
 
-[features]
-ip_in_core = []
-
 [dependencies]
-no-std-net = "0.6"
 embedded-nal = { version = "0.8.0", path = "../" }
 embedded-io-async = { version = "0.6.0" }

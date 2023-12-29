@@ -7,7 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
-No unreleased changes yet
+- Bump MSRV to 1.77.0 for `ip_in_core`.
+- Removed the `no-std-net` and `ip_in_core` features, `ip_in_core` is now the default.
 
 ## [0.8.0] - 2023-11-10
 

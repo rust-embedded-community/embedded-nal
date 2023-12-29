@@ -1,4 +1,4 @@
-use crate::SocketAddr;
+use core::net::SocketAddr;
 
 /// Represents specific errors encountered during TCP operations.
 #[non_exhaustive]

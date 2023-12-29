@@ -1,4 +1,4 @@
-use crate::IpAddr;
+use core::net::IpAddr;
 use embedded_nal::AddrType;
 
 /// This trait is an extension trait for [`TcpStack`] and [`UdpStack`] for dns

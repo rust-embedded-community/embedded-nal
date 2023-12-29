@@ -1,4 +1,4 @@
-use crate::SocketAddr;
+use core::net::SocketAddr;
 
 /// This trait is implemented by TCP/IP stacks. The trait allows the underlying driver to
 /// construct multiple connections that implement the I/O traits from embedded-io-async.
