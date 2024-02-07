@@ -14,9 +14,11 @@
 //!   Implementing `UniquelyBound` and `MultiplyBound` with the same type is expected to be a
 //!   common choice.
 
+use embedded_io_async::ErrorType;
+
 use crate::SocketAddr;
 
-/// This trait is implemented by UDP sockets.
+/// This trait is implemented by UDP sockets and models their datagram receiving functionality.
 ///
 /// The socket it represents is both bound (has a local IP address, port and interface) and
 /// connected (has a remote IP address and port).
@@ -26,13 +28,7 @@ use crate::SocketAddr;
 /// of establishing a connection (which is absent in UDP). While there is typically no POSIX
 /// `bind()` call in the creation of such sockets, these are implicitly bound to a suitable local
 /// address at connect time.
-pub trait ConnectedUdp {
-	/// Error type returned by send and receive operations.
-	type Error: embedded_io_async::Error;
-
-	/// Send the provided data to the connected peer
-	async fn send(&mut self, data: &[u8]) -> Result<(), Self::Error>;
-
+pub trait ConnectedUdpReceive: ErrorType {
 	/// Receive a datagram into the provided buffer.
 	///
 	/// If the received datagram exceeds the buffer's length, it is received regardless, and the
@@ -56,7 +52,79 @@ pub trait ConnectedUdp {
 	// async fn receive_owned(&mut self) -> Result<impl AsRef<u8> + 'static, Self::Error>;
 }
 
-/// This trait is implemented by UDP sockets.
+impl<T> ConnectedUdpReceive for &mut T
+where
+	T: ConnectedUdpReceive,
+{
+	async fn receive_into(&mut self, buffer: &mut [u8]) -> Result<usize, Self::Error> {
+		(**self).receive_into(buffer).await
+	}
+}
+
+/// This trait is implemented by UDP sockets and models their datagram sending functionality.
+///
+/// The socket it represents is both bound (has a local IP address, port and interface) and
+/// connected (has a remote IP address and port).
+///
+/// The term "connected" here refers to the semantics of POSIX datagram sockets, through which datagrams
+/// are sent and received without having a remote address per call. It does not imply any process
+/// of establishing a connection (which is absent in UDP). While there is typically no POSIX
+/// `bind()` call in the creation of such sockets, these are implicitly bound to a suitable local
+/// address at connect time.
+pub trait ConnectedUdpSend: ErrorType {
+	/// Send the provided data to the connected peer
+	async fn send(&mut self, data: &[u8]) -> Result<(), Self::Error>;
+}
+
+impl<T> ConnectedUdpSend for &mut T
+where
+	T: ConnectedUdpSend,
+{
+	async fn send(&mut self, data: &[u8]) -> Result<(), Self::Error> {
+		(**self).send(data).await
+	}
+}
+
+/// This trait is implemented by UDP sockets and provides facilities to split the socket into
+/// a separate sender and receiver halves, which can be used to send and receive datagrams concurrently.
+/// This is useful for implementing full-duplex functionality on top of UDP, which is necessary
+/// for certain application-level protocols which sit on top of the UDP transport.
+///
+/// The socket it represents is both bound (has a local IP address, port and interface) and
+/// connected (has a remote IP address and port).
+///
+/// The term "connected" here refers to the semantics of POSIX datagram sockets, through which datagrams
+/// are sent and received without having a remote address per call. It does not imply any process
+/// of establishing a connection (which is absent in UDP). While there is typically no POSIX
+/// `bind()` call in the creation of such sockets, these are implicitly bound to a suitable local
+/// address at connect time.
+pub trait ConnectedUdpSplit: ErrorType {
+	/// Type representing the receiving half of a socket which is split into a separate sender and receiver halves.
+	type Receive<'a>: ConnectedUdpReceive<Error = Self::Error>
+	where
+		Self: 'a;
+	/// Type representing the sending half of a socket which is split into a separate sender and receiver halves.
+	type Send<'a>: ConnectedUdpSend<Error = Self::Error>
+	where
+		Self: 'a;
+
+	/// Split the socket into separate sending and receiving halves which can be used to send and receive datagrams concurrently.
+	async fn split(&mut self) -> Result<(Self::Receive<'_>, Self::Send<'_>), Self::Error>;
+}
+
+impl<T> ConnectedUdpSplit for &mut T
+where
+	T: ConnectedUdpSplit,
+{
+	type Receive<'a> = T::Receive<'a> where Self: 'a;
+	type Send<'a> = T::Send<'a> where Self: 'a;
+
+	async fn split(&mut self) -> Result<(Self::Receive<'_>, Self::Send<'_>), Self::Error> {
+		(**self).split().await
+	}
+}
+
+/// This trait is implemented by UDP sockets and models their datagram receiving functionality.
 ///
 /// The socket it represents is not necessarily bound (may not have a single local IP address, port
 /// and interface), and is typically not connected (has no remote IP address and port). Both are
@@ -65,10 +133,43 @@ pub trait ConnectedUdp {
 /// If there were constraints in place at socket creation time (typically on the local side), the
 /// caller MUST pass in the same (or compatible) values, MAY and pass in unspecified values where
 /// applicable. The implementer MAY check them for compatibility, and SHOULD do that in debug mode.
-pub trait UnconnectedUdp {
-	/// Error type returned by send and receive operations.
-	type Error: embedded_io_async::Error;
+pub trait UnconnectedUdpReceive: ErrorType {
+	/// Receive a datagram into the provided buffer.
+	///
+	/// If the received datagram exceeds the buffer's length, it is received regardless, and the
+	/// remaining bytes are discarded. The full datagram size is still indicated in the result,
+	/// allowing the recipient to detect that truncation.
+	///
+	/// The local and remote address are given, in that order, in the result along with the number
+	/// of bytes.
+	async fn receive_into(
+		&mut self,
+		buffer: &mut [u8],
+	) -> Result<(usize, SocketAddr, SocketAddr), Self::Error>;
+}
 
+impl<T> UnconnectedUdpReceive for &mut T
+where
+	T: UnconnectedUdpReceive,
+{
+	async fn receive_into(
+		&mut self,
+		buffer: &mut [u8],
+	) -> Result<(usize, SocketAddr, SocketAddr), Self::Error> {
+		(**self).receive_into(buffer).await
+	}
+}
+
+/// This trait is implemented by UDP sockets and models their datagram sending functionality.
+///
+/// The socket it represents is not necessarily bound (may not have a single local IP address, port
+/// and interface), and is typically not connected (has no remote IP address and port). Both are
+/// addresses are explicitly given in every call.
+///
+/// If there were constraints in place at socket creation time (typically on the local side), the
+/// caller MUST pass in the same (or compatible) values, MAY and pass in unspecified values where
+/// applicable. The implementer MAY check them for compatibility, and SHOULD do that in debug mode.
+pub trait UnconnectedUdpSend: ErrorType {
 	/// Send the provided data to a peer
 	///
 	/// ## Sending initial messages
@@ -98,19 +199,58 @@ pub trait UnconnectedUdp {
 		remote: SocketAddr,
 		data: &[u8],
 	) -> Result<(), Self::Error>;
+}
 
-	/// Receive a datagram into the provided buffer.
-	///
-	/// If the received datagram exceeds the buffer's length, it is received regardless, and the
-	/// remaining bytes are discarded. The full datagram size is still indicated in the result,
-	/// allowing the recipient to detect that truncation.
-	///
-	/// The local and remote address are given, in that order, in the result along with the number
-	/// of bytes.
-	async fn receive_into(
+impl<T> UnconnectedUdpSend for &mut T
+where
+	T: UnconnectedUdpSend,
+{
+	async fn send(
 		&mut self,
-		buffer: &mut [u8],
-	) -> Result<(usize, SocketAddr, SocketAddr), Self::Error>;
+		local: SocketAddr,
+		remote: SocketAddr,
+		data: &[u8],
+	) -> Result<(), Self::Error> {
+		(**self).send(local, remote, data).await
+	}
+}
+
+/// This trait is implemented by UDP sockets and provides facilities to split the socket into
+/// a separate sender and receiver halves, which can be used to send and receive datagrams concurrently.
+/// This is useful for implementing full-duplex functionality on top of UDP, which is necessary
+/// for certain application-level protocols which sit on top of the UDP transport.
+///
+/// The socket it represents is not necessarily bound (may not have a single local IP address, port
+/// and interface), and is typically not connected (has no remote IP address and port). Both are
+/// addresses are explicitly given in every call.
+///
+/// If there were constraints in place at socket creation time (typically on the local side), the
+/// caller MUST pass in the same (or compatible) values, MAY and pass in unspecified values where
+/// applicable. The implementer MAY check them for compatibility, and SHOULD do that in debug mode.
+pub trait UnconnectedUdpSplit: ErrorType {
+	/// Type representing the receiving half of a socket which is split into a separate sender and receiver halves.
+	type Receive<'a>: UnconnectedUdpReceive<Error = Self::Error>
+	where
+		Self: 'a;
+	/// Type representing the sending half of a socket which is split into a separate sender and receiver halves.
+	type Send<'a>: UnconnectedUdpSend<Error = Self::Error>
+	where
+		Self: 'a;
+
+	/// Split the socket into separate sending and receiving halves which can be used to send and receive datagrams concurrently.
+	async fn split(&mut self) -> Result<(Self::Receive<'_>, Self::Send<'_>), Self::Error>;
+}
+
+impl<T> UnconnectedUdpSplit for &mut T
+where
+	T: UnconnectedUdpSplit,
+{
+	type Receive<'a> = T::Receive<'a> where Self: 'a;
+	type Send<'a> = T::Send<'a> where Self: 'a;
+
+	async fn split(&mut self) -> Result<(Self::Receive<'_>, Self::Send<'_>), Self::Error> {
+		(**self).split().await
+	}
 }
 
 /// This trait is implemented by UDP/IP stacks. The trait allows the underlying driver to
@@ -123,11 +263,23 @@ pub trait UdpStack {
 	type Error: embedded_io_async::Error;
 
 	/// Eventual socket return type of the [`.connect()`] method
-	type Connected: ConnectedUdp<Error = Self::Error>;
+	type Connected<'a>: ConnectedUdpSend<Error = Self::Error>
+		+ ConnectedUdpReceive<Error = Self::Error>
+		+ ConnectedUdpSplit<Error = Self::Error>
+	where
+		Self: 'a;
 	/// Eventual socket return type of the [`.bind_single()`] method
-	type UniquelyBound: UnconnectedUdp<Error = Self::Error>;
+	type UniquelyBound<'a>: UnconnectedUdpSend<Error = Self::Error>
+		+ UnconnectedUdpReceive<Error = Self::Error>
+		+ UnconnectedUdpSplit<Error = Self::Error>
+	where
+		Self: 'a;
 	/// Eventual return type of the [`.bind_multiple()`] method
-	type MultiplyBound: UnconnectedUdp<Error = Self::Error>;
+	type MultiplyBound<'a>: UnconnectedUdpSend<Error = Self::Error>
+		+ UnconnectedUdpReceive<Error = Self::Error>
+		+ UnconnectedUdpSplit<Error = Self::Error>
+	where
+		Self: 'a;
 
 	/// Create a socket that has a fixed remote address.
 	///
@@ -139,7 +291,7 @@ pub trait UdpStack {
 	async fn connect(
 		&self,
 		remote: SocketAddr,
-	) -> Result<(SocketAddr, Self::Connected), Self::Error> {
+	) -> Result<(SocketAddr, Self::Connected<'_>), Self::Error> {
 		use crate::{Ipv4Addr, Ipv6Addr, SocketAddr::*, SocketAddrV4, SocketAddrV6};
 
 		let local = match remote {
@@ -158,7 +310,7 @@ pub trait UdpStack {
 		&self,
 		local: SocketAddr,
 		remote: SocketAddr,
-	) -> Result<(SocketAddr, Self::Connected), Self::Error>;
+	) -> Result<(SocketAddr, Self::Connected<'_>), Self::Error>;
 
 	/// Create a socket that has a fixed local address.
 	///
@@ -171,7 +323,7 @@ pub trait UdpStack {
 	async fn bind_single(
 		&self,
 		local: SocketAddr,
-	) -> Result<(SocketAddr, Self::UniquelyBound), Self::Error>;
+	) -> Result<(SocketAddr, Self::UniquelyBound<'_>), Self::Error>;
 
 	/// Create a socket that has no single fixed local address.
 	///
@@ -195,5 +347,8 @@ pub trait UdpStack {
 	/// * There is currently no hybrid binding that allows emulating what POSIX systems do when
 	///   binding to `[::]:0`, that is, picking some available port but then still leaving the
 	///   interface and IP address unspecified.
-	async fn bind_multiple(&self, local: SocketAddr) -> Result<Self::MultiplyBound, Self::Error>;
+	async fn bind_multiple(
+		&self,
+		local: SocketAddr,
+	) -> Result<Self::MultiplyBound<'_>, Self::Error>;
 }
