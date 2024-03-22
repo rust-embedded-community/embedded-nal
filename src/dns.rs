@@ -1,4 +1,4 @@
-use crate::IpAddr;
+use core::net::IpAddr;
 
 /// This is the host address type to be returned by `gethostbyname`.
 ///

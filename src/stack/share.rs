@@ -1,5 +1,6 @@
-use crate::{nb, SocketAddr, TcpClientStack, TcpFullStack, UdpClientStack, UdpFullStack};
+use crate::{nb, TcpClientStack, TcpFullStack, UdpClientStack, UdpFullStack};
 use core::cell::RefCell;
+use core::net::SocketAddr;
 
 /// Sharable wrapper for a network stack implementation.
 ///
@@ -12,7 +13,8 @@ use core::cell::RefCell;
 ///
 /// ```
 /// use embedded_nal::SharableStack;
-/// # use embedded_nal::{UdpClientStack, SocketAddr, SocketAddrV4, Ipv4Addr, nb};
+/// use core::net::{SocketAddr, SocketAddrV4, Ipv4Addr};
+/// # use embedded_nal::{UdpClientStack, nb};
 /// # struct SomeNalDriver {}
 /// # impl SomeNalDriver {
 /// #   fn new() -> Self { Self {} }

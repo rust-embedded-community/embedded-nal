@@ -17,10 +17,5 @@ readme = "README.md"
 keywords = ["network"]
 categories = ["embedded", "hardware-support", "no-std", "network-programming"]
 
-[features]
-default = ["no-std-net"]
-ip_in_core = []
-
 [dependencies]
 nb = "1"
-no-std-net = { version = "0.6", optional = true }

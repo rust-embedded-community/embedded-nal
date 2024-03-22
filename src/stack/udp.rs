@@ -1,4 +1,4 @@
-use crate::SocketAddr;
+use core::net::SocketAddr;
 
 /// This trait is implemented by UDP/IP stacks. You could, for example, have
 /// an implementation which knows how to send AT commands to an ESP8266 WiFi

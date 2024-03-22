@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-No unreleased changes yet.
+- Removed the `ip_in_core` feature, this is now the default.
 
 ## [0.7.1] - 2023-11-28
 
