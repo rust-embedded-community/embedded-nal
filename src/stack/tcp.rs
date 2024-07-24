@@ -1,31 +1,13 @@
+use crate::NetworkStack;
 use core::net::SocketAddr;
-
-/// Represents specific errors encountered during TCP operations.
-#[non_exhaustive]
-#[derive(Copy, Clone, PartialEq, Debug)]
-pub enum TcpErrorKind {
-	/// The socket has been closed in the direction in which the failing operation was attempted.
-	PipeClosed,
-
-	/// Some other error has occurred.
-	Other,
-}
-
-/// Methods to resolve errors into identifiable, actionable codes on the client side.
-pub trait TcpError: core::fmt::Debug {
-	/// Determines the kind of error that occurred.
-	fn kind(&self) -> TcpErrorKind;
-}
 
 /// This trait is implemented by TCP/IP stacks. You could, for example, have an implementation
 /// which knows how to send AT commands to an ESP8266 WiFi module. You could have another implementation
 /// which knows how to driver the Rust Standard Library's `std::net` module. Given this trait, you can
 /// write a portable HTTP client which can work with either implementation.
-pub trait TcpClientStack {
+pub trait TcpClientStack: NetworkStack {
 	/// The type returned when we create a new TCP socket
 	type TcpSocket;
-	/// The type returned when we have an error
-	type Error: TcpError;
 
 	/// Open a socket for usage as a TCP client.
 	///
@@ -96,8 +78,6 @@ pub trait TcpFullStack: TcpClientStack {
 }
 
 impl<T: TcpClientStack> TcpClientStack for &mut T {
-	type Error = T::Error;
-
 	type TcpSocket = T::TcpSocket;
 
 	fn socket(&mut self) -> Result<Self::TcpSocket, Self::Error> {

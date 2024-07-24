@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Bump MSRV to 1.77.0 for `ip_in_core`.
 - Removed the `no-std-net` and `ip_in_core` features, `ip_in_core` is now the default.
 
+## Changed
+- [breaking] The DNS traits have been removed and placed into the default `NetworkStack`
+implementation. All stacks must implement these traits (but may implement them as `Unsupported`
+        features.
+
 ## [0.8.0] - 2023-11-10
 
 - Bump MSRV to 1.60.0 (required for Edition 2021)
