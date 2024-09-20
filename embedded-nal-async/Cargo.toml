@@ -1,6 +1,6 @@
 [package]
 name = "embedded-nal-async"
-version = "0.7.1"
+version = "0.8.0"
 edition = "2021"
 description = "An Async Network Abstraction Layer (NAL) for Embedded Systems"
 license = "MIT OR Apache-2.0"
@@ -12,5 +12,5 @@ keywords = ["network"]
 categories = ["embedded", "hardware-support", "no-std", "network-programming", "asynchronous"]
 
 [dependencies]
-embedded-nal = { version = "0.8.0", path = "../" }
+embedded-nal = { version = "0.9.0", path = "../" }
 embedded-io-async = { version = "0.6.0" }
