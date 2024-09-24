@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+No unreleased changes yet
+
+## [0.8.0] - 2024-09-20
+
 - Removed the `ip_in_core` feature, this is now the default.
 
 ## [0.7.1] - 2023-11-28
@@ -47,7 +51,8 @@ Remove TcpClientStack, TcpFullStack and UDP traits pending traits that support s
 
 Initial release to crates.io.
 
-[Unreleased]: https://github.com/rust-embedded-community/embedded-nal/compare/embedded-nal-async-v0.7.1...HEAD
+[Unreleased]: https://github.com/rust-embedded-community/embedded-nal/compare/embedded-nal-async-v0.8.0...HEAD
+[0.8.0]: https://github.com/rust-embedded-community/embedded-nal/compare/embedded-nal-async-v0.7.1...embedded-nal-async-v0.8.0
 [0.7.1]: https://github.com/rust-embedded-community/embedded-nal/compare/embedded-nal-async-v0.7.0...embedded-nal-async-v0.7.1
 [0.7.0]: https://github.com/rust-embedded-community/embedded-nal/compare/embedded-nal-async-v0.6.0...embedded-nal-async-v0.7.0
 [0.6.0]: https://github.com/rust-embedded-community/embedded-nal/compare/embedded-nal-async-v0.5.0...embedded-nal-async-v0.6.0
