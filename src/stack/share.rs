@@ -1,4 +1,6 @@
-use crate::{nb, TcpClientStack, TcpFullStack, UdpClientStack, UdpFullStack};
+use crate::{
+	nb, AddrType, IpAddr, NetworkStack, TcpClientStack, TcpFullStack, UdpClientStack, UdpFullStack,
+};
 use core::cell::RefCell;
 use core::net::SocketAddr;
 
@@ -97,17 +99,26 @@ macro_rules! forward {
     }
 }
 
+impl<'a, T> NetworkStack for SharedStack<'a, T>
+where
+	T: NetworkStack,
+{
+	type Error = T::Error;
+
+	forward! {get_host_by_name(hostname: &str, addr_type: AddrType) -> nb::Result<IpAddr, Self::Error>}
+	forward! {get_host_by_address(addr: IpAddr, result: &mut [u8]) -> nb::Result<usize, Self::Error>}
+}
+
 impl<'a, T> UdpClientStack for SharedStack<'a, T>
 where
 	T: UdpClientStack,
 {
-	type Error = T::Error;
 	type UdpSocket = T::UdpSocket;
 
 	forward! {socket() -> Result<Self::UdpSocket, Self::Error>}
 	forward! {connect(socket: &mut Self::UdpSocket, address: SocketAddr) -> Result<(), Self::Error>}
-	forward! {send(socket: &mut Self::UdpSocket, data: &[u8]) -> Result<(), nb::Error<<T as UdpClientStack>::Error>>}
-	forward! {receive(socket: &mut Self::UdpSocket, data: &mut [u8]) -> Result<(usize, SocketAddr), nb::Error<<T as UdpClientStack>::Error>>}
+	forward! {send(socket: &mut Self::UdpSocket, data: &[u8]) -> Result<(), nb::Error<T::Error>>}
+	forward! {receive(socket: &mut Self::UdpSocket, data: &mut [u8]) -> Result<(usize, SocketAddr), nb::Error<T::Error>>}
 	forward! {close(socket: Self::UdpSocket) -> Result<(), Self::Error>}
 }
 
@@ -116,7 +127,7 @@ where
 	T: UdpFullStack,
 {
 	forward! {bind(socket: &mut Self::UdpSocket, local_port: u16) -> Result<(), Self::Error>}
-	forward! {send_to(socket: &mut Self::UdpSocket, remote: SocketAddr, buffer: &[u8]) -> Result<(), nb::Error<<T as UdpClientStack>::Error>>}
+	forward! {send_to(socket: &mut Self::UdpSocket, remote: SocketAddr, buffer: &[u8]) -> Result<(), nb::Error<T::Error>>}
 }
 
 impl<'a, T> TcpClientStack for SharedStack<'a, T>
@@ -124,12 +135,11 @@ where
 	T: TcpClientStack,
 {
 	type TcpSocket = T::TcpSocket;
-	type Error = T::Error;
 
 	forward! {socket() -> Result<Self::TcpSocket, Self::Error>}
-	forward! {connect(socket: &mut Self::TcpSocket, address: SocketAddr) -> Result<(), nb::Error<<T as TcpClientStack>::Error>>}
-	forward! {send(socket: &mut Self::TcpSocket, data: &[u8]) -> Result<usize, nb::Error<<T as TcpClientStack>::Error>>}
-	forward! {receive(socket: &mut Self::TcpSocket, data: &mut [u8]) -> Result<usize, nb::Error<<T as TcpClientStack>::Error>>}
+	forward! {connect(socket: &mut Self::TcpSocket, address: SocketAddr) -> Result<(), nb::Error<T::Error>>}
+	forward! {send(socket: &mut Self::TcpSocket, data: &[u8]) -> Result<usize, nb::Error<T::Error>>}
+	forward! {receive(socket: &mut Self::TcpSocket, data: &mut [u8]) -> Result<usize, nb::Error<T::Error>>}
 	forward! {close(socket: Self::TcpSocket) -> Result<(), Self::Error>}
 }
 
@@ -137,7 +147,7 @@ impl<'a, T> TcpFullStack for SharedStack<'a, T>
 where
 	T: TcpFullStack,
 {
-	forward! {bind(socket: &mut Self::TcpSocket, port: u16) -> Result<(), <T as TcpClientStack>::Error>}
-	forward! {listen(socket: &mut Self::TcpSocket) -> Result<(), <T as TcpClientStack>::Error>}
-	forward! {accept(socket: &mut Self::TcpSocket) -> Result<(<T as TcpClientStack>::TcpSocket, SocketAddr), nb::Error<<T as TcpClientStack>::Error>>}
+	forward! {bind(socket: &mut Self::TcpSocket, port: u16) -> Result<(), T::Error>}
+	forward! {listen(socket: &mut Self::TcpSocket) -> Result<(), T::Error>}
+	forward! {accept(socket: &mut Self::TcpSocket) -> Result<(T::TcpSocket, SocketAddr), nb::Error<T::Error>>}
 }

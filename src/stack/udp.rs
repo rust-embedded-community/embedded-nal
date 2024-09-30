@@ -1,3 +1,4 @@
+use crate::NetworkStack;
 use core::net::SocketAddr;
 
 /// This trait is implemented by UDP/IP stacks. You could, for example, have
@@ -5,11 +6,9 @@ use core::net::SocketAddr;
 /// module. You could have another implementation which knows how to driver the
 /// Rust Standard Library's `std::net` module. Given this trait, you can how
 /// write a portable CoAP client which can work with either implementation.
-pub trait UdpClientStack {
+pub trait UdpClientStack: NetworkStack {
 	/// The type returned when we create a new UDP socket
 	type UdpSocket;
-	/// The type returned when we have an error
-	type Error: core::fmt::Debug;
 
 	/// Allocate a socket for further use.
 	fn socket(&mut self) -> Result<Self::UdpSocket, Self::Error>;
@@ -61,8 +60,6 @@ pub trait UdpFullStack: UdpClientStack {
 }
 
 impl<T: UdpClientStack> UdpClientStack for &mut T {
-	type Error = T::Error;
-
 	type UdpSocket = T::UdpSocket;
 
 	fn socket(&mut self) -> Result<Self::UdpSocket, Self::Error> {
