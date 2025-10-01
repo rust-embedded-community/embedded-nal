@@ -24,7 +24,10 @@ pub trait TcpConnect {
 impl<T: TcpConnect> TcpConnect for &T {
 	type Error = T::Error;
 
-	type Connection<'a> = T::Connection<'a> where Self: 'a;
+	type Connection<'a>
+		= T::Connection<'a>
+	where
+		Self: 'a;
 
 	async fn connect<'a>(
 		&'a self,
